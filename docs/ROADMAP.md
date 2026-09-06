@@ -37,6 +37,9 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [ ] Group admin tools (member management, group listings)
 - [x] User profile pages (host history, not follower counts)
 - [x] Skills advertising (SkillOffer discovery + owner APIs)
+- [x] Skill create UI form
+- [x] Peer vouch flow on public profiles
+- [x] EVENT_HOSTED / EVENT_COMPLETED on listing completion
 - [ ] Image uploads for listings and groups
 - [ ] Geocoding integration for location input
 

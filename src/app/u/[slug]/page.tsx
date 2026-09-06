@@ -4,10 +4,12 @@ import { MapPin, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrustBadge } from "@/components/profiles/trust-badge";
+import { VouchButton } from "@/components/profiles/vouch-button";
 import { SkillOfferCard } from "@/components/skills/skill-offer-card";
 import { ListingTags } from "@/components/listings/listing-tags";
 import { getPublicProfileBySlug } from "@/lib/profiles";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isPhoneVerified } from "@/lib/auth";
+import { hasVouched } from "@/lib/reputation";
 import { formatMemberSince } from "@/lib/format";
 
 interface ProfilePageProps {
@@ -29,6 +31,8 @@ export default async function PublicProfilePage({ params }: ProfilePageProps) {
   const [profile, me] = await Promise.all([getPublicProfileBySlug(slug), getCurrentUser()]);
   if (!profile) notFound();
   const isOwn = me?.id === profile.id;
+  const alreadyVouched =
+    me && !isOwn ? await hasVouched(me.id, profile.id) : false;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
@@ -78,16 +82,53 @@ export default async function PublicProfilePage({ params }: ProfilePageProps) {
         <div className="mt-6">
           <TrustBadge trust={profile.trust} />
         </div>
+
+        {!isOwn && (
+          <div className="mt-5">
+            <VouchButton
+              toSlug={profile.slug}
+              alreadyVouched={alreadyVouched}
+              isLoggedIn={!!me}
+              phoneVerified={me ? isPhoneVerified(me) : false}
+            />
+          </div>
+        )}
+
+        {isOwn && (
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link href="/skills/new">
+              <Button className="rounded-2xl">Offer a skill</Button>
+            </Link>
+            <Link href="/skills">
+              <Button variant="outline" className="rounded-2xl">Browse skills</Button>
+            </Link>
+          </div>
+        )}
       </div>
 
       <section className="mt-10">
-        <div className="mb-4 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-terracotta" />
-          <h2 className="font-serif text-2xl font-bold">Skills offered</h2>
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-terracotta" />
+            <h2 className="font-serif text-2xl font-bold">Skills offered</h2>
+          </div>
+          {isOwn && (
+            <Link href="/skills/new" className="text-sm font-semibold text-terracotta hover:underline">
+              Add skill →
+            </Link>
+          )}
         </div>
         {profile.skillOffers.length === 0 ? (
           <p className="text-sm text-ink-muted rounded-3xl border border-dashed border-stone/60 bg-cream/50 p-6">
             No active skill offers yet.
+            {isOwn && (
+              <>
+                {" "}
+                <Link href="/skills/new" className="text-terracotta font-semibold hover:underline">
+                  Create one
+                </Link>
+              </>
+            )}
           </p>
         ) : (
           <div className="grid gap-4">

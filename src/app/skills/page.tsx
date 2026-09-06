@@ -47,6 +47,12 @@ export default async function SkillsPage({ searchParams }: SkillsPageProps) {
         <p className="mt-2 text-white/80 max-w-xl leading-relaxed">
           Browse what people near {area.locationLabel} offer. Filter by you — we never bury newcomers behind reputation.
         </p>
+        <Link
+          href="/skills/new"
+          className="mt-5 inline-flex items-center rounded-2xl bg-white text-sage font-semibold px-5 py-2.5 shadow-md hover:bg-cream transition-colors"
+        >
+          Offer a skill
+        </Link>
       </div>
 
       <SkillsFilters
@@ -74,8 +80,8 @@ export default async function SkillsPage({ searchParams }: SkillsPageProps) {
         <div className="mt-8 rounded-3xl border border-dashed border-stone/60 bg-cream/60 p-10 text-center">
           <p className="font-serif text-xl font-bold text-ink">Nothing here yet</p>
           <p className="mt-2 text-sm text-ink-muted">Be the first to share a skill in this area.</p>
-          <Link href="/settings" className="inline-block mt-4 text-terracotta font-semibold hover:underline">
-            Complete your profile →
+          <Link href="/skills/new" className="inline-block mt-4 text-terracotta font-semibold hover:underline">
+            Offer a skill →
           </Link>
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -22,15 +23,23 @@ interface Announcement {
 
 interface HostPanelProps {
   listingId: string;
+  listingStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
   rsvps: RsvpUser[];
   initialAnnouncements: Announcement[];
 }
 
-export function HostPanel({ listingId, rsvps, initialAnnouncements }: HostPanelProps) {
+export function HostPanel({
+  listingId,
+  listingStatus = "ACTIVE",
+  rsvps,
+  initialAnnouncements,
+}: HostPanelProps) {
   const router = useRouter();
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [announcementBody, setAnnouncementBody] = useState("");
   const [loading, setLoading] = useState<string | null>(null);
+  const [status, setStatus] = useState(listingStatus);
+  const [completeMessage, setCompleteMessage] = useState("");
 
   const pending = rsvps.filter((r) => r.status === "GOING" && !r.approved);
   const going = rsvps.filter((r) => r.status === "GOING" && r.approved);
@@ -64,11 +73,76 @@ export function HostPanel({ listingId, rsvps, initialAnnouncements }: HostPanelP
     }
   }
 
+  async function markCompleted() {
+    if (status === "COMPLETED") return;
+    if (
+      !window.confirm(
+        "Mark this listing completed? You’ll earn EVENT_HOSTED trust, and approved attendees earn EVENT_COMPLETED."
+      )
+    ) {
+      return;
+    }
+    setLoading("complete");
+    setCompleteMessage("");
+    try {
+      const res = await fetch("/api/listings/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listingId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to complete");
+      setStatus("COMPLETED");
+      setCompleteMessage("Marked completed — reputation ledger updated.");
+      router.refresh();
+    } catch (e) {
+      setCompleteMessage(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setLoading(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border-2 border-sage/30 bg-sage/5 p-6">
         <h2 className="font-serif text-lg font-bold text-sage">Host dashboard</h2>
         <p className="text-sm text-ink-muted mt-1">Manage attendees and send updates to RSVPs.</p>
+      </div>
+
+      <div className="rounded-2xl border border-stone/60 bg-white p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h3 className="font-semibold">Listing status</h3>
+            <p className="text-sm text-ink-muted mt-0.5">
+              {status === "COMPLETED"
+                ? "Completed — trust awards applied (idempotent)."
+                : "When the meetup happened, mark it completed to credit trust."}
+            </p>
+          </div>
+          {status === "COMPLETED" ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sage/10 text-sage px-3 py-1.5 text-sm font-semibold">
+              <CheckCircle2 className="h-4 w-4" />
+              Completed
+            </span>
+          ) : status === "CANCELLED" ? (
+            <span className="rounded-full bg-stone/20 text-ink-muted px-3 py-1.5 text-sm font-semibold">
+              Cancelled
+            </span>
+          ) : (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="rounded-xl"
+              disabled={loading === "complete"}
+              onClick={markCompleted}
+            >
+              {loading === "complete" ? "Saving..." : "Mark completed"}
+            </Button>
+          )}
+        </div>
+        {completeMessage && (
+          <p className="mt-3 text-sm font-medium text-sage">{completeMessage}</p>
+        )}
       </div>
 
       {pending.length > 0 && (

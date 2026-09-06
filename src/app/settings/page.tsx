@@ -112,6 +112,21 @@ export default async function SettingsPage() {
         </div>
       </section>
 
+      <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
+        <h2 className="font-serif text-lg font-semibold">Skills</h2>
+        <p className="mt-2 text-sm text-ink-muted">
+          Share what you can offer neighbors. Discovery stays equal — no paid boosts.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link href="/skills/new">
+            <Button className="rounded-2xl">Offer a skill</Button>
+          </Link>
+          <Link href="/skills">
+            <Button variant="outline" className="rounded-2xl">Browse skills</Button>
+          </Link>
+        </div>
+      </section>
+
       <div className="mt-8 flex justify-between items-center">
         <Link href="/post">
           <Button>Post a listing</Button>

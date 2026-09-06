@@ -152,6 +152,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
         <div className="mt-8">
           <HostPanel
             listingId={listing.id}
+            listingStatus={listing.status}
             rsvps={listing.rsvps}
             initialAnnouncements={listing.announcements.map((a) => ({
               ...a,
