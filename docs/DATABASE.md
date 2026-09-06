@@ -30,6 +30,8 @@ Quick reference: [`.grok/references/schema-reference.md`](../.grok/references/sc
 | SkillOffer | Neighbor skill advertising (sibling to Listing) |
 | ReputationEvent | Append-only trust ledger |
 | Feedback | Two-sided ratings tied to listing/skill context |
+| Suggestion | Community feature/idea proposals with cached voteCount |
+| SuggestionVote | Unique user↔suggestion upvote pair |
 
 ## Key enums
 
@@ -39,6 +41,7 @@ Quick reference: [`.grok/references/schema-reference.md`](../.grok/references/sc
 - **phoneVerifiedAt / emailVerifiedAt:** account verification timestamps
 - **RsvpStatus:** INTERESTED, GOING, WAITLIST
 - **ReportStatus:** OPEN, REVIEWING, ACTIONED, DISMISSED
+- **SuggestionStatus:** OPEN, PLANNED, DONE, CLOSED
 - **User.isModerator:** demo/admin flag (Joe seeded true); also `MODERATOR_USER_IDS` env
 
 ## Migrations

@@ -17,6 +17,7 @@ export function Footer() {
             <div className="flex flex-wrap gap-5 text-sm text-white/70">
               <Link href="/groups" className="hover:text-white transition-colors">Groups</Link>
               <Link href="/skills" className="hover:text-white transition-colors">Skills</Link>
+              <Link href="/suggestions" className="hover:text-white transition-colors">Ideas</Link>
               <Link href="/discover" className="hover:text-white transition-colors">Discover</Link>
               <Link href="/about" className="hover:text-white transition-colors">About</Link>
               <Link href="/safety" className="hover:text-white transition-colors">Safety</Link>

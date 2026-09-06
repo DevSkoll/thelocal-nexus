@@ -52,6 +52,12 @@ export async function Header() {
               Skills
             </Link>
             <Link
+              href="/suggestions"
+              className="hidden lg:flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Ideas
+            </Link>
+            <Link
               href="/search"
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
             >

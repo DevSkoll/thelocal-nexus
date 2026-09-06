@@ -287,3 +287,43 @@ Remove a member. Requires phone-verified group admin.
 
 **Response:** `{ ok: true }`
 
+## Suggestions
+
+Community suggestion box. Equal visibility — no paid boosts. Phone verification required to submit or vote.
+
+### `GET /api/suggestions`
+
+List suggestions.
+
+**Query:**
+- `sort` — `new` (default) or `top` (by voteCount)
+- `status` — `OPEN` | `PLANNED` | `DONE` | `CLOSED` (omit for all)
+
+**Response:** `{ suggestions: [{ id, slug, title, body, status, voteCount, createdAt, viewerHasVoted, author: { id, name, slug } }] }`
+
+### `POST /api/suggestions`
+
+Create a suggestion. Requires verified phone.
+
+**Body:** `{ "title": string (5–120), "body": string (10–5000) }`
+
+**Response:** `{ id, slug, title, status, voteCount }`
+
+### `GET /api/suggestions/:id`
+
+Fetch one suggestion (includes `viewerHasVoted` when signed in).
+
+### `POST /api/suggestions/:id/vote`
+
+Toggle upvote (idempotent add/remove). Requires verified phone.
+
+**Response:** `{ ok: true, voted: boolean, voteCount, id }`
+
+### `PATCH /api/suggestions/:id`
+
+Update status. Moderators only (`isModerator` / allowlist).
+
+**Body:** `{ "status": "OPEN" | "PLANNED" | "DONE" | "CLOSED" }`
+
+**Response:** `{ ok: true, suggestion: { id, status, title, voteCount } }`
+

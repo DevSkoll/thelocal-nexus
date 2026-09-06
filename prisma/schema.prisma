@@ -115,6 +115,8 @@ model User {
   reputationActions    ReputationEvent[]   @relation("ReputationActor")
   feedbackGiven        Feedback[]          @relation("FeedbackFrom")
   feedbackReceived     Feedback[]          @relation("FeedbackTo")
+  suggestions          Suggestion[]
+  suggestionVotes      SuggestionVote[]
 }
 
 model Interest {
@@ -377,4 +379,41 @@ model Feedback {
   @@unique([fromUserId, toUserId, listingId])
   @@unique([fromUserId, toUserId, skillOfferId])
   @@index([toUserId, createdAt])
+}
+
+enum SuggestionStatus {
+  OPEN
+  PLANNED
+  DONE
+  CLOSED
+}
+
+model Suggestion {
+  id        String           @id @default(cuid())
+  slug      String?          @unique
+  title     String
+  body      String
+  authorId  String
+  status    SuggestionStatus @default(OPEN)
+  voteCount Int              @default(0)
+  createdAt DateTime         @default(now())
+
+  author User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  votes  SuggestionVote[]
+
+  @@index([status, createdAt])
+  @@index([status, voteCount])
+}
+
+model SuggestionVote {
+  id           String   @id @default(cuid())
+  suggestionId String
+  userId       String
+  createdAt    DateTime @default(now())
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionId, userId])
+  @@index([userId])
 }

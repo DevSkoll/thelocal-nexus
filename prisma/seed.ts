@@ -27,6 +27,8 @@ function daysFromNow(days: number, hours = 0) {
 
 async function main() {
   await db.phoneOtpChallenge.deleteMany();
+  await db.suggestionVote.deleteMany();
+  await db.suggestion.deleteMany();
   await db.feedback.deleteMany();
   await db.reputationEvent.deleteMany();
   await db.skillOfferInterest.deleteMany();
@@ -807,11 +809,88 @@ async function main() {
     ],
   });
 
+  // Community suggestion box samples
+  const sugCalendar = await db.suggestion.create({
+    data: {
+      slug: "recurring-event-calendar",
+      title: "Calendar view for recurring events",
+      body: "A simple month/week view would make it easier to see bike rides and barn nights without scrolling the discover list. Equal for everyone — no boosted spots.",
+      authorId: mira.id,
+      status: "OPEN",
+      voteCount: 0,
+      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    },
+  });
+  const sugWaitlist = await db.suggestion.create({
+    data: {
+      slug: "waitlist-when-full",
+      title: "Waitlist when an event hits capacity",
+      body: "When the barn fills up, let neighbors join a waitlist and get notified if a spot opens. Keeps the RSVP flow honest.",
+      authorId: todd.id,
+      status: "PLANNED",
+      voteCount: 0,
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    },
+  });
+  const sugPhotos = await db.suggestion.create({
+    data: {
+      slug: "listing-photo-uploads",
+      title: "Photo uploads for listings and groups",
+      body: "A couple of photos would help people recognize a hangout spot or venue — still keep discovery equal, just clearer.",
+      authorId: sam.id,
+      status: "OPEN",
+      voteCount: 0,
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    },
+  });
+  const sugGeocode = await db.suggestion.create({
+    data: {
+      slug: "geocoding-for-addresses",
+      title: "Geocoding so hosts can type an address",
+      body: "Typing lat/lng is awkward. Let hosts paste an address or neighborhood and pin the map for them.",
+      authorId: joe.id,
+      status: "OPEN",
+      voteCount: 0,
+      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await db.suggestionVote.createMany({
+    data: [
+      { suggestionId: sugCalendar.id, userId: joe.id },
+      { suggestionId: sugCalendar.id, userId: todd.id },
+      { suggestionId: sugCalendar.id, userId: sam.id },
+      { suggestionId: sugWaitlist.id, userId: mira.id },
+      { suggestionId: sugWaitlist.id, userId: joe.id },
+      { suggestionId: sugPhotos.id, userId: mira.id },
+      { suggestionId: sugPhotos.id, userId: todd.id },
+      { suggestionId: sugGeocode.id, userId: mira.id },
+    ],
+  });
+
+  await db.suggestion.update({
+    where: { id: sugCalendar.id },
+    data: { voteCount: 3 },
+  });
+  await db.suggestion.update({
+    where: { id: sugWaitlist.id },
+    data: { voteCount: 2 },
+  });
+  await db.suggestion.update({
+    where: { id: sugPhotos.id },
+    data: { voteCount: 2 },
+  });
+  await db.suggestion.update({
+    where: { id: sugGeocode.id },
+    data: { voteCount: 1 },
+  });
+
   console.log("Seed complete:");
   console.log("  4 users with slugs + reputation");
   console.log("  3 groups, 16 listings (Portland + Fayetteville, multi-city demo)");
   console.log("  Skill offers, reputation events, feedback, RSVPs, messages");
   console.log("  Sample reports + Joe isModerator for /moderation");
+  console.log("  Suggestion box samples with votes");
 }
 
 main()

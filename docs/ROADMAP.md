@@ -26,11 +26,10 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [x] Listing edit and cancel (host)
 - [x] Group creation flow
 - [x] Admin moderation queue for reports
+- [x] Suggestion box with community voting (equal visibility, phone-verified)
 - [ ] Postgres migration path (replace SQLite for production)
 
 ## Medium-term
-
-- [ ] Suggestion box with vote options (community proposes features/ideas and votes)
 
 - [ ] Recurring event calendar view
 - [ ] Waitlist management when at capacity
