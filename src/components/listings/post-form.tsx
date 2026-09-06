@@ -12,13 +12,17 @@ interface PostFormProps {
   userId: string;
   userGroups: { id: string; name: string }[];
   defaultLocation: { lat: number; lng: number; label: string };
+  initialGroupId?: string;
 }
 
-export function PostForm({ userId, userGroups, defaultLocation }: PostFormProps) {
+export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }: PostFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const initialAsGroup =
+    !!initialGroupId && userGroups.some((g) => g.id === initialGroupId);
 
   const [form, setForm] = useState({
     type: "",
@@ -35,12 +39,12 @@ export function PostForm({ userId, userGroups, defaultLocation }: PostFormProps)
     rsvpRequired: false,
     rsvpApprovalRequired: false,
     homeHosted: false,
-    posterType: "PERSON",
-    posterGroupId: "",
+    posterType: initialAsGroup ? "GROUP" : "PERSON",
+    posterGroupId: initialAsGroup ? initialGroupId! : "",
     isPaid: false,
     priceMin: "",
     priceMax: "",
-    natureTag: "INDIVIDUAL",
+    natureTag: initialAsGroup ? "ORGANIZATION" : "INDIVIDUAL",
     interestSlugs: [] as string[],
   });
 
@@ -121,10 +125,13 @@ export function PostForm({ userId, userGroups, defaultLocation }: PostFormProps)
           <h2 className="font-serif text-xl font-semibold">Tell people about it</h2>
 
           {userGroups.length > 0 && (
-            <div>
-              <label className="text-sm text-ink-muted">Posting as</label>
+            <div className="rounded-2xl border border-sage/25 bg-sage/5 p-4">
+              <label className="text-sm font-semibold text-sage">Post as my group</label>
+              <p className="mt-0.5 text-xs text-ink-muted">
+                Groups you admin can host listings with equal discovery — no boosts.
+              </p>
               <select
-                className="mt-1 w-full rounded-xl border border-stone bg-white px-4 py-2.5"
+                className="mt-2 w-full rounded-xl border border-stone bg-white px-4 py-2.5"
                 value={form.posterGroupId ? `group:${form.posterGroupId}` : "person"}
                 onChange={(e) => {
                   if (e.target.value.startsWith("group:")) {

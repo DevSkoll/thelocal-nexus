@@ -34,7 +34,7 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 
 - [ ] Recurring event calendar view
 - [ ] Waitlist management when at capacity
-- [ ] Group admin tools (member management, group listings)
+- [x] Group admin tools (member management, group listings)
 - [x] User profile pages (host history, not follower counts)
 - [x] Skills advertising (SkillOffer discovery + owner APIs)
 - [x] Skill create UI form

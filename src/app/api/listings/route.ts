@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { requirePhoneVerified } from "@/lib/auth";
+import { isGroupAdmin } from "@/lib/groups/admin";
 
 const natureTagEnum = z.enum([
   "INDIVIDUAL",
@@ -71,6 +72,16 @@ const createListingSchema = z
         });
       }
     }
+
+    if (data.posterType === "GROUP" || data.posterType === "ORGANIZATION") {
+      if (!data.posterGroupId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Choose a group to post as",
+          path: ["posterGroupId"],
+        });
+      }
+    }
   });
 
 export async function POST(req: NextRequest) {
@@ -102,6 +113,25 @@ export async function POST(req: NextRequest) {
           : priceMin;
     }
 
+    const postingAsGroup =
+      data.posterType === "GROUP" || data.posterType === "ORGANIZATION";
+    let posterGroupId: string | null = null;
+    if (postingAsGroup) {
+      const groupId = data.posterGroupId!;
+      const group = await db.group.findUnique({ where: { id: groupId }, select: { id: true } });
+      if (!group) {
+        return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      }
+      const admin = await isGroupAdmin(user.id, groupId);
+      if (!admin) {
+        return NextResponse.json(
+          { error: "Only group admins can post as this group" },
+          { status: 403 }
+        );
+      }
+      posterGroupId = groupId;
+    }
+
     let slug = slugify(data.title);
     const existing = await db.listing.findUnique({ where: { slug } });
     if (existing) slug = `${slug}-${Date.now().toString(36)}`;
@@ -112,9 +142,9 @@ export async function POST(req: NextRequest) {
         title: data.title,
         description: data.description,
         type: data.type,
-        posterType: data.posterType,
-        posterUserId: data.posterType === "PERSON" ? user.id : null,
-        posterGroupId: data.posterGroupId || null,
+        posterType: postingAsGroup ? data.posterType : "PERSON",
+        posterUserId: postingAsGroup ? null : user.id,
+        posterGroupId,
         latitude: data.latitude,
         longitude: data.longitude,
         locationLabel: data.locationLabel,

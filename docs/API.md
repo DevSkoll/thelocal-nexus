@@ -56,7 +56,9 @@ Create a listing. Requires verified phone (403 if not).
 | recurrenceRule | string | no | e.g. `weekly:saturday:09:00` |
 | capacity | string | no | Parsed as int |
 | posterType | PosterType | no | Default PERSON |
-| posterGroupId | string | no | When posting as group |
+| posterGroupId | string | if GROUP/ORGANIZATION | Must be a group the user admins |
+
+When `posterType` is `GROUP` or `ORGANIZATION`, the caller must be an **ADMIN** of `posterGroupId` (403 otherwise). `posterUserId` is left null; host tools treat group admins as hosts.
 
 **Response:** `{ slug, id }`
 
@@ -254,3 +256,34 @@ Requires auth.
 ```
 
 Returns 409 if already a member.
+
+### `GET /api/groups/:slug/members`
+
+List group members. Requires phone-verified **group admin**. Never returns phone numbers.
+
+**Response:** `{ group: { id, slug, name }, members: [{ id, role, joinedAt, user: { id, name, slug } }] }`
+
+### `PATCH /api/groups/:slug/members`
+
+Promote or demote a member. Requires phone-verified group admin.
+
+**Body:** `{ "userId": "<cuid>", "role": "ADMIN" | "MEMBER" }`
+
+**Rules:**
+- Cannot demote the last remaining admin (400)
+- 404 if member not found
+
+**Response:** `{ ok: true, member }`
+
+### `DELETE /api/groups/:slug/members`
+
+Remove a member. Requires phone-verified group admin.
+
+**Body:** `{ "userId": "<cuid>" }`
+
+**Rules:**
+- Cannot remove the last remaining admin (400)
+- 404 if member not found
+
+**Response:** `{ ok: true }`
+

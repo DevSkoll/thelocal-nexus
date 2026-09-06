@@ -5,8 +5,16 @@ import { getCurrentUser } from "@/lib/auth";
 import { getAreaPreference } from "@/lib/location";
 import { db } from "@/lib/db";
 
-export default async function PostPage() {
-  const [user, area] = await Promise.all([getCurrentUser(), getAreaPreference()]);
+interface PostPageProps {
+  searchParams: Promise<{ group?: string }>;
+}
+
+export default async function PostPage({ searchParams }: PostPageProps) {
+  const [{ group: groupParam }, user, area] = await Promise.all([
+    searchParams,
+    getCurrentUser(),
+    getAreaPreference(),
+  ]);
 
   if (!user) {
     return (
@@ -51,6 +59,11 @@ export default async function PostPage() {
         userId={user.id}
         userGroups={userGroups.map((m) => ({ id: m.group.id, name: m.group.name }))}
         defaultLocation={defaultLocation}
+        initialGroupId={
+          groupParam && userGroups.some((m) => m.group.id === groupParam)
+            ? groupParam
+            : undefined
+        }
       />
     </div>
   );

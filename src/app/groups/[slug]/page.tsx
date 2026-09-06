@@ -28,9 +28,11 @@ export default async function GroupPage({ params }: GroupPageProps) {
   if (!group) notFound();
 
   const user = await getCurrentUser();
-  const isMember = user
-    ? group.members.some((m) => m.userId === user.id)
-    : false;
+  const membership = user
+    ? group.members.find((m) => m.userId === user.id)
+    : undefined;
+  const isMember = !!membership;
+  const isAdmin = membership?.role === "ADMIN";
 
   const verification = formatGroupVerification(group.verification);
   const upcomingListings = group.listings.filter(
@@ -74,13 +76,21 @@ export default async function GroupPage({ params }: GroupPageProps) {
 
           <p className="mt-6 text-ink leading-relaxed max-w-2xl">{group.description}</p>
 
-          <div className="mt-6">
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <JoinButton
               groupId={group.id}
               groupName={group.name}
               isMember={isMember}
               isLoggedIn={!!user}
             />
+            {isAdmin && (
+              <Link
+                href={`/groups/${group.slug}/admin`}
+                className="inline-flex items-center rounded-xl border-2 border-sage bg-white px-5 py-2.5 text-sm font-semibold text-sage shadow-sm transition-colors hover:bg-sage/5"
+              >
+                Admin tools
+              </Link>
+            )}
           </div>
         </div>
       </div>
