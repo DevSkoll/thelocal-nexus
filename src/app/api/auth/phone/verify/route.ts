@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { setCurrentUser } from "@/lib/auth";
 import { maskPhone, normalizePhone } from "@/lib/phone";
 import { getSmsProvider } from "@/lib/sms";
+import { slugify } from "@/lib/utils";
 import { AREA_COOKIE, parseAreaCookie } from "@/lib/area-cookie";
 
 const verifySchema = z.object({
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
             phone,
             phoneVerifiedAt: now,
             name: data.name?.trim() || maskPhone(phone),
+            slug: slugify(data.name?.trim() || maskPhone(phone)) || ("member-" + Date.now().toString(36)),
             ...locationData,
           },
         });

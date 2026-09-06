@@ -27,6 +27,9 @@ Quick reference: [`.grok/references/schema-reference.md`](../.grok/references/sc
 | Announcement | Host updates on a listing |
 | Report | User moderation reports |
 | Alert | Interest + radius notification preference |
+| SkillOffer | Neighbor skill advertising (sibling to Listing) |
+| ReputationEvent | Append-only trust ledger |
+| Feedback | Two-sided ratings tied to listing/skill context |
 
 ## Key enums
 

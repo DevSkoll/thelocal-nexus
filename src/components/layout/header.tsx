@@ -38,6 +38,12 @@ export async function Header() {
               Discover
             </Link>
             <Link
+              href="/skills"
+              className="hidden md:flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Skills
+            </Link>
+            <Link
               href="/search"
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
             >
@@ -60,7 +66,7 @@ export async function Header() {
               </Button>
             </Link>
             <Link
-              href={user ? "/settings" : "/login"}
+              href={user ? (user.slug ? `/u/${user.slug}` : "/settings") : "/login"}
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
             >
               <User className="h-4 w-4" />

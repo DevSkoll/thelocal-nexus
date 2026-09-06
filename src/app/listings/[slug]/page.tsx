@@ -16,6 +16,8 @@ import {
   formatFounded,
 } from "@/lib/format";
 import { formatDistanceToNow } from "date-fns";
+import { TrustBadge } from "@/components/profiles/trust-badge";
+import { getPublicTrustSummary } from "@/lib/reputation";
 
 interface ListingPageProps {
   params: Promise<{ slug: string }>;
@@ -46,7 +48,9 @@ export default async function ListingPage({ params }: ListingPageProps) {
   const posterName = listing.posterGroup?.name ?? listing.posterUser?.name ?? "Community member";
   const posterLink = listing.posterGroup
     ? `/groups/${listing.posterGroup.slug}`
-    : null;
+    : listing.posterUser?.slug
+      ? `/u/${listing.posterUser.slug}`
+      : null;
   const verification = listing.posterUser
     ? formatVerification(listing.posterUser.verificationTier, {
         phoneVerifiedAt: listing.posterUser.phoneVerifiedAt,
@@ -54,6 +58,9 @@ export default async function ListingPage({ params }: ListingPageProps) {
       })
     : null;
   const goingRsvps = listing.rsvps.filter((r) => r.status === "GOING" && r.approved);
+  const hostTrust = listing.posterUser
+    ? await getPublicTrustSummary(listing.posterUser.id)
+    : null;
   const userRsvp = user
     ? listing.rsvps.find((r) => r.userId === user.id) ?? null
     : null;
@@ -199,6 +206,9 @@ export default async function ListingPage({ params }: ListingPageProps) {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {verification}
               </p>
+            )}
+            {hostTrust && (
+              <div className="mt-2"><TrustBadge trust={hostTrust} compact /></div>
             )}
             {listing.posterGroup && (
               <p className="text-xs text-ink-muted mt-0.5">

@@ -70,3 +70,7 @@ docker compose restart          # Restart (re-seeds if DEMO_SEED=true)
 - `better-sqlite3` compiled in image (native module)
 - Standalone Next.js output for smaller runtime
 - Data volume: `thelocal-data` → `/data/dev.db`
+
+## Version 1.0 target host
+
+Demo and pre-1.0 traffic stay on **THOR + NPM**. For Version 1.0, plan a **dedicated Linode** host (Postgres migration, TLS, backups). Do not treat the current SQLite Docker demo as the final production topology.

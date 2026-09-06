@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { ProfileEditForm } from "@/components/profiles/profile-edit-form";
 import { getCurrentUser } from "@/lib/auth";
 import { formatVerificationBadges } from "@/lib/format";
 import { maskPhone } from "@/lib/phone";
@@ -52,8 +53,25 @@ export default async function SettingsPage() {
           </div>
         </div>
         {user.bio && <p className="mt-4 text-sm text-ink-muted">{user.bio}</p>}
+        {user.slug && (
+          <p className="mt-2 text-sm">
+            <Link href={`/u/${user.slug}`} className="text-terracotta font-semibold hover:underline">
+              View public profile →
+            </Link>
+          </p>
+        )}
       </section>
 
+      
+      <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
+        <h2 className="font-serif text-lg font-semibold mb-4">Edit public profile</h2>
+        <ProfileEditForm
+          name={user.name}
+          slug={user.slug}
+          headline={user.headline}
+          bio={user.bio}
+        />
+      </section>
       <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
           <MapPin className="h-5 w-5 text-terracotta" />

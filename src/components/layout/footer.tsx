@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
 
 export function Footer() {
@@ -13,14 +14,20 @@ export function Footer() {
                 Find what&apos;s happening near you. Then log off and live your life.
               </p>
             </div>
-            <div className="flex gap-6 text-sm text-white/70">
-              <a href="/safety" className="hover:text-white transition-colors">Safety</a>
-              <a href="/discover" className="hover:text-white transition-colors">Discover</a>
-              <a href="/settings" className="hover:text-white transition-colors">Settings</a>
+            <div className="flex flex-wrap gap-5 text-sm text-white/70">
+              <Link href="/skills" className="hover:text-white transition-colors">Skills</Link>
+              <Link href="/discover" className="hover:text-white transition-colors">Discover</Link>
+              <Link href="/about" className="hover:text-white transition-colors">About</Link>
+              <Link href="/safety" className="hover:text-white transition-colors">Safety</Link>
+              <Link href="/settings" className="hover:text-white transition-colors">Settings</Link>
             </div>
           </div>
           <p className="mt-6 text-xs text-white/50">
             No algorithmic feeds. No pay-to-be-seen. No vanity metrics. Just your community.
+          </p>
+          <p className="mt-2 text-xs text-white/55">
+            Intentionally AI-built — helping businesses, communities, and people connect in real life.{" "}
+            <Link href="/about" className="underline hover:text-white/80">Learn more</Link>
           </p>
         </div>
       </div>

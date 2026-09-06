@@ -76,3 +76,7 @@ We collect minimal data. Phone numbers are never shown publicly (masked in UI).
 ## Brand
 
 Visual design uses an American-proud palette (navy, red, white). Copy is community-focused — colors express pride, words express connection. No patriotic slogans in text.
+
+## Intentionally AI-built
+
+TheLocal is proudly AI-assisted. We use AI to help ship features for businesses, communities, and neighbors — while humans hold the product line: listings not feeds, equal discovery, phone-first privacy. See `/about` in the app.

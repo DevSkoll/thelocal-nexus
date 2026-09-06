@@ -27,6 +27,10 @@ function daysFromNow(days: number, hours = 0) {
 
 async function main() {
   await db.phoneOtpChallenge.deleteMany();
+  await db.feedback.deleteMany();
+  await db.reputationEvent.deleteMany();
+  await db.skillOfferInterest.deleteMany();
+  await db.skillOffer.deleteMany();
   await db.announcement.deleteMany();
   await db.message.deleteMany();
   await db.report.deleteMany();
@@ -55,8 +59,12 @@ async function main() {
       phoneVerifiedAt: verifiedAt,
       email: "joe@example.com",
       name: "Joe Martinez",
+      slug: "joe-martinez",
+      headline: "Bike club organizer · weekend rides",
       bio: "Bike enthusiast. Building community one ride at a time.",
       verificationTier: "VERIFIED_HOST",
+      reputationScore: 72,
+      reputationUpdatedAt: verifiedAt,
       zipCode: "97201",
       latitude: 45.5231,
       longitude: -122.6765,
@@ -80,8 +88,12 @@ async function main() {
       phoneVerifiedAt: verifiedAt,
       email: "mira@example.com",
       name: "Mira Chen",
+      slug: "mira-chen",
+      headline: "Barn host · music, D&D, and art",
       bio: "Barn host for music nights, D&D, and art gatherings.",
       verificationTier: "VERIFIED_HOST",
+      reputationScore: 65,
+      reputationUpdatedAt: verifiedAt,
       zipCode: "97214",
       latitude: 45.5152,
       longitude: -122.6784,
@@ -109,8 +121,12 @@ async function main() {
       phoneVerifiedAt: verifiedAt,
       email: "todd@example.com",
       name: "Todd Williams",
+      slug: "todd-williams",
+      headline: "Volunteer coordinator · river cleanups",
       bio: "Volunteer coordinator at Riverfront Community Network.",
       verificationTier: "UNVERIFIED",
+      reputationScore: 18,
+      reputationUpdatedAt: verifiedAt,
       zipCode: "97201",
       latitude: 45.5122,
       longitude: -122.6587,
@@ -134,8 +150,12 @@ async function main() {
       phoneVerifiedAt: verifiedAt,
       email: "sam@example.com",
       name: "Sam Okonkwo",
+      slug: "sam-okonkwo",
+      headline: "Hawthorne Roastery · open mics & coffee",
       bio: "Owner of Hawthorne Roastery. Hosting open mics and neighborhood events.",
       verificationTier: "VERIFIED_HOST",
+      reputationScore: 58,
+      reputationUpdatedAt: verifiedAt,
       zipCode: "97214",
       latitude: 45.512,
       longitude: -122.632,
@@ -648,10 +668,118 @@ async function main() {
     ],
   });
 
+
+  // Skill offers
+  const skillBike = await db.skillOffer.create({
+    data: {
+      slug: "bike-tune-up-help",
+      userId: joe.id,
+      title: "Bike tune-up help",
+      description: "I will help you adjust brakes, gears, and teach basic maintenance in a park meetup. Bring your bike — tools provided.",
+      status: "ACTIVE",
+      latitude: 45.5231,
+      longitude: -122.6765,
+      locationLabel: "Portland, OR",
+      radiusMiles: 15,
+      priceMin: 0,
+      priceMax: 25,
+      interests: { create: [{ interestId: interestId("cycling") }] },
+    },
+  });
+
+  const skillWatercolor = await db.skillOffer.create({
+    data: {
+      slug: "watercolor-coaching",
+      userId: mira.id,
+      title: "Beginner watercolor coaching",
+      description: "One-on-one or tiny-group watercolor tips in the barn studio. Materials available for a small materials fee.",
+      status: "ACTIVE",
+      latitude: 45.5152,
+      longitude: -122.6784,
+      locationLabel: "Southeast Portland",
+      radiusMiles: 20,
+      priceMin: 15,
+      priceMax: 40,
+      interests: { create: [{ interestId: interestId("arts") }] },
+    },
+  });
+
+  await db.skillOffer.create({
+    data: {
+      slug: "espresso-basics",
+      userId: sam.id,
+      title: "Home espresso basics",
+      description: "Learn dialing-in, milk texture, and tasting notes at the roastery after hours. Great for curious neighbors.",
+      status: "ACTIVE",
+      latitude: 45.512,
+      longitude: -122.632,
+      locationLabel: "Hawthorne, Portland",
+      radiusMiles: 10,
+      priceMin: null,
+      priceMax: null,
+      interests: {
+        create: [{ interestId: interestId("food") }, { interestId: interestId("music") }],
+      },
+    },
+  });
+
+  await db.skillOffer.create({
+    data: {
+      slug: "volunteer-shift-coaching",
+      userId: todd.id,
+      title: "Volunteer shift coaching",
+      description: "New to organizing cleanups? I will walk you through signup flows, safety briefings, and day-of logistics.",
+      status: "ACTIVE",
+      latitude: 45.5122,
+      longitude: -122.6587,
+      locationLabel: "Portland, OR",
+      radiusMiles: 25,
+      priceMin: 0,
+      priceMax: 0,
+      interests: { create: [{ interestId: interestId("volunteering") }] },
+    },
+  });
+
+  // Reputation ledger samples (scores on users already set)
+  await db.reputationEvent.createMany({
+    data: [
+      { subjectUserId: joe.id, actorUserId: mira.id, reason: "VOUCH", points: 8, note: "Reliable ride leader" },
+      { subjectUserId: joe.id, reason: "EVENT_HOSTED", points: 10, note: "Saturday urban ride" },
+      { subjectUserId: joe.id, reason: "PROFILE_COMPLETED", points: 5 },
+      { subjectUserId: mira.id, actorUserId: joe.id, reason: "POSITIVE_FEEDBACK", points: 3, note: "Warm barn host" },
+      { subjectUserId: mira.id, reason: "EVENT_HOSTED", points: 10 },
+      { subjectUserId: mira.id, skillOfferId: skillWatercolor.id, reason: "SKILL_COMPLETED", points: 5 },
+      { subjectUserId: sam.id, reason: "EVENT_HOSTED", points: 10 },
+      { subjectUserId: sam.id, actorUserId: todd.id, reason: "POSITIVE_FEEDBACK", points: 3 },
+      { subjectUserId: todd.id, reason: "EVENT_COMPLETED", points: 5 },
+      { subjectUserId: todd.id, reason: "PROFILE_COMPLETED", points: 5 },
+      { subjectUserId: joe.id, skillOfferId: skillBike.id, actorUserId: todd.id, reason: "SKILL_COMPLETED", points: 5 },
+    ],
+  });
+
+  await db.feedback.createMany({
+    data: [
+      {
+        fromUserId: joe.id,
+        toUserId: mira.id,
+        listingId: createdListings["barn-music-night-march"],
+        rating: 5,
+        body: "Cozy space and clear house rules. Felt welcome.",
+      },
+      {
+        fromUserId: todd.id,
+        toUserId: joe.id,
+        skillOfferId: skillBike.id,
+        rating: 5,
+        body: "Patient teacher — brakes feel great now.",
+      },
+    ],
+  });
+
   console.log("Seed complete:");
-  console.log("  4 users (Joe, Mira, Todd, Sam)");
+  console.log("  4 users with slugs + reputation");
   console.log("  3 groups, 16 listings (Portland + Fayetteville, multi-city demo)");
-  console.log("  RSVPs, messages, announcements, and interest alerts");
+  console.log("  Skill offers, reputation events, feedback, RSVPs, messages");
 }
 
 main()

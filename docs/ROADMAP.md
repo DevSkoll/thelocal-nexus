@@ -15,13 +15,14 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [x] Listing reports
 - [x] Safety page
 - [x] Phone-first OTP auth (Twilio + mock fallback)
+- [x] AI-built product story (About page + footer note)
 - [x] Rich seed data (11 listings, RSVPs, messages)
 
 ## Near-term
 
 - [ ] Email OTP as secondary verification
 - [ ] SMS notifications for alerts and RSVP updates
-- [ ] Reputation points and automatic Verified Host promotion
+- [x] Reputation points and automatic Verified Host promotion
 - [ ] Listing edit and cancel (host)
 - [ ] Group creation flow
 - [ ] Admin moderation queue for reports
@@ -29,12 +30,20 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 
 ## Medium-term
 
+- [ ] Suggestion box with vote options (community proposes features/ideas and votes)
+
 - [ ] Recurring event calendar view
 - [ ] Waitlist management when at capacity
 - [ ] Group admin tools (member management, group listings)
-- [ ] User profile pages (host history, not follower counts)
+- [x] User profile pages (host history, not follower counts)
+- [x] Skills advertising (SkillOffer discovery + owner APIs)
 - [ ] Image uploads for listings and groups
 - [ ] Geocoding integration for location input
+
+## Version 1.0 hosting
+
+- **Until 1.0:** keep running on THOR + NPM as today.
+- **At / post 1.0:** move to a **dedicated Linode host** (infra work tracked separately — not in this foundation PR).
 
 ## Explicitly not planned
 
