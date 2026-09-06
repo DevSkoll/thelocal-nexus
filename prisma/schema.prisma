@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum VerificationTier {
+  UNVERIFIED
+  VERIFIED_HOST
+}
+
+enum GroupType {
+  COMMUNITY
+  ORGANIZATION
+  BUSINESS
+}
+
+enum GroupVerification {
+  UNVERIFIED
+  ESTABLISHED
+}
+
+enum ListingType {
+  ONE_TIME_EVENT
+  RECURRING_EVENT
+  GROUP_SEEKING
+  HANGOUT_SPOT
+  VOLUNTEER
+  WORKSHOP
+  LOOKING_FOR
+}
+
+enum PosterType {
+  PERSON
+  GROUP
+  ORGANIZATION
+}
+
+enum LocationPrecision {
+  EXACT
+  APPROXIMATE
+  NEIGHBORHOOD
+}
+
+enum ListingStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ListingNatureTag {
+  INDIVIDUAL
+  GATHERING
+  BUSINESS
+  ORGANIZATION
+  LARGE_EVENT
+}
+
+enum RsvpStatus {
+  INTERESTED
+  GOING
+  WAITLIST
+}
+
+enum GroupRole {
+  MEMBER
+  ADMIN
+}
+
+model User {
+  id               String           @id @default(cuid())
+  phone            String           @unique
+  phoneVerifiedAt  DateTime?
+  email            String?          @unique
+  emailVerifiedAt  DateTime?
+  name             String
+  bio              String?
+  avatarUrl        String?
+  verificationTier VerificationTier @default(UNVERIFIED)
+  zipCode          String?
+  latitude         Float?
+  longitude        Float?
+  locationLabel    String?
+  radiusMiles      Int              @default(20)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  interests       UserInterest[]
+  groupsCreated   Group[]        @relation("GroupCreator")
+  groupMembers    GroupMember[]
+  listings        Listing[]      @relation("UserListings")
+  rsvps           Rsvp[]
+  alerts          Alert[]
+  messages        Message[]
+  reportsMade     Report[]       @relation("ReportsMade")
+  announcements   Announcement[]
+}
+
+model Interest {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
+  icon String?
+
+  users    UserInterest[]
+  listings ListingInterest[]
+  alerts   Alert[]
+}
+
+model UserInterest {
+  userId     String
+  interestId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([userId, interestId])
+}
+
+model Group {
+  id               String            @id @default(cuid())
+  slug             String            @unique
+  name             String
+  description      String
+  coverImageUrl    String?
+  type             GroupType         @default(COMMUNITY)
+  verification     GroupVerification @default(UNVERIFIED)
+  latitude         Float?
+  longitude        Float?
+  locationLabel    String?
+  foundedAt        DateTime          @default(now())
+  createdById      String
+  createdBy        User              @relation("GroupCreator", fields: [createdById], references: [id])
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  members  GroupMember[]
+  listings Listing[]   @relation("GroupListings")
+}
+
+model GroupMember {
+  id       String    @id @default(cuid())
+  userId   String
+  groupId  String
+  role     GroupRole @default(MEMBER)
+  joinedAt DateTime  @default(now())
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model Listing {
+  id                    String            @id @default(cuid())
+  slug                  String            @unique
+  title                 String
+  description           String
+  type                  ListingType
+  posterType            PosterType
+  posterUserId          String?
+  posterGroupId         String?
+  latitude              Float
+  longitude             Float
+  locationLabel         String
+  locationPrecision     LocationPrecision @default(APPROXIMATE)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  recurrenceRule        String?
+  capacity              Int?
+  rsvpRequired          Boolean           @default(false)
+  rsvpApprovalRequired  Boolean           @default(false)
+  homeHosted            Boolean           @default(false)
+  isPaid                Boolean           @default(false)
+  priceMin              Float?
+  priceMax              Float?
+  natureTag             ListingNatureTag  @default(GATHERING)
+  status                ListingStatus     @default(ACTIVE)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  posterUser  User?             @relation("UserListings", fields: [posterUserId], references: [id])
+  posterGroup Group?            @relation("GroupListings", fields: [posterGroupId], references: [id])
+  interests     ListingInterest[]
+  rsvps         Rsvp[]
+  messages      Message[]
+  reports       Report[]
+  announcements Announcement[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  listingId String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  listingId  String
+  reporterId String
+  reason     String
+  details    String?
+  createdAt  DateTime @default(now())
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporter   User     @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  listingId String
+  hostId    String
+  body      String
+  createdAt DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  host      User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+}
+
+model ListingInterest {
+  listingId  String
+  interestId String
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([listingId, interestId])
+}
+
+model Rsvp {
+  id        String     @id @default(cuid())
+  listingId String
+  userId    String
+  status    RsvpStatus @default(INTERESTED)
+  approved  Boolean    @default(true)
+  message   String?
+  createdAt DateTime   @default(now())
+  listing   Listing    @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, userId])
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  userId      String
+  interestId  String
+  radiusMiles Int      @default(20)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest    Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, interestId])
+}
+
+model PhoneOtpChallenge {
+  id        String   @id @default(cuid())
+  phone     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}

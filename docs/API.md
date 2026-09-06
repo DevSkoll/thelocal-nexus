@@ -1,0 +1,179 @@
+# API Reference
+
+All endpoints return JSON. Errors use `{ error: string }` with an appropriate HTTP status.
+
+Authentication: session cookie `thelocal_user_id` set after phone OTP verification.
+
+Privileged actions (create listing, post comment) require `phoneVerifiedAt` — returns 403 otherwise.
+
+## Auth
+
+### `POST /api/auth/phone/send`
+
+Send OTP to phone. Uses Twilio Verify when env vars set; mock SMS in dev (returns `devCode`).
+
+**Body:** `{ "phone": "(503) 555-0101" }`
+
+**Response:** `{ ok: true, phone: "+15035550101", mock: true, devCode?: "123456" }`
+
+### `POST /api/auth/phone/verify`
+
+Verify OTP, find-or-create user, set `phoneVerifiedAt`, set session cookie.
+
+**Body:** `{ "phone": "+15035550101", "code": "123456", "name?": "Display name" }`
+
+**Response:** `{ ok: true, user: { id, name, isNew } }`
+
+Account recovery uses the same flow — no separate password reset.
+
+### `POST /api/auth/logout`
+
+Clears session cookie.
+
+## Listings
+
+### `POST /api/listings`
+
+Create a listing. Requires verified phone (403 if not).
+
+**Body (key fields):**
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| type | ListingType | yes | ONE_TIME_EVENT, RECURRING_EVENT, etc. |
+| title | string | yes | 3–120 chars |
+| description | string | yes | 10–5000 chars |
+| locationLabel | string | yes | |
+| latitude, longitude | number | yes | |
+| natureTag | ListingNatureTag | yes | Single nature classification |
+| interestSlugs | string[] | yes | Min 1 interest slug |
+| isPaid | boolean | no | Default false |
+| priceMin, priceMax | number | if paid | Required when isPaid |
+| rsvpRequired | boolean | no | |
+| rsvpApprovalRequired | boolean | no | |
+| homeHosted | boolean | no | |
+| startsAt, endsAt | ISO string | no | |
+| recurrenceRule | string | no | e.g. `weekly:saturday:09:00` |
+| capacity | string | no | Parsed as int |
+| posterType | PosterType | no | Default PERSON |
+| posterGroupId | string | no | When posting as group |
+
+**Response:** `{ slug, id }`
+
+## RSVP
+
+### `POST /api/rsvp`
+
+Requires auth.
+
+**Body:**
+```json
+{
+  "listingId": "<cuid>",
+  "status": "GOING" | "INTERESTED",
+  "message": "optional note to host"
+}
+```
+
+**Rules:**
+- Home-hosted listings block GOING for UNVERIFIED users (403)
+- When `rsvpApprovalRequired` is true, GOING RSVPs start with `approved: false`
+
+### `POST /api/rsvp/approve`
+
+Host only. Requires auth.
+
+**Body:**
+```json
+{ "rsvpId": "<cuid>", "approved": true }
+```
+
+## Settings
+
+### `PATCH /api/settings`
+
+Requires auth. Updates user profile.
+
+**Body:**
+```json
+{
+  "locationLabel": "Portland, OR",
+  "latitude": 45.52,
+  "longitude": -122.67,
+  "radiusMiles": 15,
+  "interestSlugs": ["cycling", "music"]
+}
+```
+
+## Alerts
+
+### `POST /api/alerts`
+
+Requires auth. Upserts interest alert.
+
+**Body:**
+```json
+{ "interestSlug": "cycling", "radiusMiles": 15 }
+```
+
+### `DELETE /api/alerts?interestSlug=cycling`
+
+Requires auth. Removes alert for interest.
+
+## Messages
+
+### `GET /api/messages?listingId=<cuid>`
+
+Public. Returns up to 50 messages with user names.
+
+### `POST /api/messages`
+
+Requires auth.
+
+**Body:**
+```json
+{ "listingId": "<cuid>", "body": "message text" }
+```
+
+## Announcements
+
+### `GET /api/announcements?listingId=<cuid>`
+
+Public. Returns up to 10 host announcements.
+
+### `POST /api/announcements`
+
+Host only. Requires auth.
+
+**Body:**
+```json
+{ "listingId": "<cuid>", "body": "announcement text" }
+```
+
+## Reports
+
+### `POST /api/reports`
+
+Requires auth.
+
+**Body:**
+```json
+{
+  "listingId": "<cuid>",
+  "reason": "SPAM" | "SAFETY" | "MISLEADING" | "INAPPROPRIATE" | "OTHER",
+  "details": "optional context"
+}
+```
+
+## Groups
+
+### `POST /api/groups/join`
+
+Requires auth.
+
+**Body:**
+```json
+{ "groupId": "<cuid>" }
+```
+
+Returns 409 if already a member.

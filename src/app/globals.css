@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand palette */
+  --cream: #ffffff;
+  --cream-dark: #eef2f8;
+  --ink: #0a1628;
+  --ink-muted: #4a5d75;
+  --terracotta: #bf0a30;
+  --terracotta-dark: #8b0722;
+  --sage: #002868;
+  --sage-dark: #001a4d;
+  --stone: #c5d4e8;
+  --brand-red: #bf0a30;
+  --brand-blue: #002868;
+  --brand-white: #ffffff;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-dark: var(--terracotta-dark);
+  --color-sage: var(--sage);
+  --color-sage-dark: var(--sage-dark);
+  --color-stone: var(--stone);
+  --color-brand-red: var(--brand-red);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-white: var(--brand-white);
+  --font-sans: var(--font-libre-franklin);
+  --font-serif: var(--font-merriweather);
+}
+
+body {
+  background: var(--cream-dark);
+  color: var(--ink);
+  font-family: var(--font-libre-franklin), system-ui, sans-serif;
+}
+
+.brand-bar {
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--brand-red) 0%,
+    var(--brand-red) 33%,
+    var(--brand-white) 33%,
+    var(--brand-white) 66%,
+    var(--brand-blue) 66%,
+    var(--brand-blue) 100%
+  );
+}
+
+.brand-hero {
+  background-color: var(--brand-white);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(0, 40, 104, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(191, 10, 48, 0.05) 0%, transparent 50%),
+    repeating-linear-gradient(
+      -12deg,
+      transparent,
+      transparent 28px,
+      rgba(0, 40, 104, 0.02) 28px,
+      rgba(0, 40, 104, 0.02) 29px
+    );
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
