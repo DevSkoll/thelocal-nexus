@@ -70,6 +70,13 @@ enum GroupRole {
   ADMIN
 }
 
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  ACTIONED
+  DISMISSED
+}
+
 model User {
   id                  String           @id @default(cuid())
   phone               String           @unique
@@ -82,6 +89,7 @@ model User {
   bio                 String?
   avatarUrl           String?
   verificationTier    VerificationTier @default(UNVERIFIED)
+  isModerator         Boolean          @default(false)
   reputationScore     Int              @default(0)
   reputationUpdatedAt DateTime?
   zipCode             String?
@@ -100,6 +108,7 @@ model User {
   alerts               Alert[]
   messages             Message[]
   reportsMade          Report[]            @relation("ReportsMade")
+  reportsReviewed      Report[]            @relation("ReportsReviewed")
   announcements        Announcement[]
   skillOffers          SkillOffer[]
   reputationEvents     ReputationEvent[]   @relation("ReputationSubject")
@@ -212,14 +221,19 @@ model Message {
 }
 
 model Report {
-  id         String   @id @default(cuid())
-  listingId  String
-  reporterId String
-  reason     String
-  details    String?
-  createdAt  DateTime @default(now())
-  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  reporter   User     @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  listingId      String
+  reporterId     String
+  reason         String
+  details        String?
+  status         ReportStatus @default(OPEN)
+  reviewedAt     DateTime?
+  reviewerId     String?
+  resolutionNote String?
+  createdAt      DateTime     @default(now())
+  listing        Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporter       User         @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reviewer       User?        @relation("ReportsReviewed", fields: [reviewerId], references: [id], onDelete: SetNull)
 }
 
 model Announcement {

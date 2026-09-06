@@ -63,6 +63,7 @@ async function main() {
       headline: "Bike club organizer · weekend rides",
       bio: "Bike enthusiast. Building community one ride at a time.",
       verificationTier: "VERIFIED_HOST",
+      isModerator: true,
       reputationScore: 72,
       reputationUpdatedAt: verifiedAt,
       zipCode: "97201",
@@ -740,6 +741,36 @@ async function main() {
     },
   });
 
+  // Sample moderation reports (queue demo — Joe is moderator)
+  await db.report.createMany({
+    data: [
+      {
+        listingId: createdListings["looking-for-hiking-buddy"],
+        reporterId: mira.id,
+        reason: "SAFETY",
+        details: "Meetup spot feels unclear and they asked for personal phone off-platform.",
+        status: "OPEN",
+      },
+      {
+        listingId: createdListings["roastery-open-mic-night"],
+        reporterId: todd.id,
+        reason: "MISLEADING",
+        details: "Cover charge mentioned in comments but listing says optional tip jar.",
+        status: "OPEN",
+      },
+      {
+        listingId: createdListings["makers-meetup-portland"],
+        reporterId: sam.id,
+        reason: "SPAM",
+        details: "Looks like a crypto promo pasted into the description.",
+        status: "REVIEWING",
+        reviewedAt: verifiedAt,
+        reviewerId: joe.id,
+        resolutionNote: "Checking with host before action.",
+      },
+    ],
+  });
+
   // Reputation ledger samples (scores on users already set)
   await db.reputationEvent.createMany({
     data: [
@@ -780,6 +811,7 @@ async function main() {
   console.log("  4 users with slugs + reputation");
   console.log("  3 groups, 16 listings (Portland + Fayetteville, multi-city demo)");
   console.log("  Skill offers, reputation events, feedback, RSVPs, messages");
+  console.log("  Sample reports + Joe isModerator for /moderation");
 }
 
 main()

@@ -25,7 +25,7 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [x] Reputation points and automatic Verified Host promotion
 - [x] Listing edit and cancel (host)
 - [ ] Group creation flow
-- [ ] Admin moderation queue for reports
+- [x] Admin moderation queue for reports
 - [ ] Postgres migration path (replace SQLite for production)
 
 ## Medium-term
@@ -65,7 +65,7 @@ These conflict with product principles (see [PRODUCT.md](PRODUCT.md)):
 |------|-----|
 | Auth | Phone OTP only; no email/password login yet |
 | Notifications | Alerts stored but not delivered |
-| Moderation | Reports stored but no admin UI |
+| Moderation | Queue shipped; expand tools (appeals, audit log) later |
 | Images | No upload; text-only listings |
 | Mobile | Responsive web only; no native app |
 | Search | Basic text match; no fuzzy/geo autocomplete |

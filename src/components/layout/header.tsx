@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { Plus, Search, User, LayoutDashboard } from "lucide-react";
+import { Plus, Search, User, LayoutDashboard, Shield } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/auth";
+import { isModerator } from "@/lib/moderation";
 import { getAreaPreference } from "@/lib/location";
 import { LocationMenu } from "./location-menu";
 import { Button } from "@/components/ui/button";
 
 export async function Header() {
   const [user, area] = await Promise.all([getCurrentUser(), getAreaPreference()]);
+  const showModeration = user ? isModerator(user) : false;
 
   return (
     <header className="sticky top-0 z-50">
@@ -57,6 +59,15 @@ export async function Header() {
               >
                 <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden lg:inline">Host</span>
+              </Link>
+            )}
+            {showModeration && (
+              <Link
+                href="/moderation"
+                className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden lg:inline">Moderation</span>
               </Link>
             )}
             <Link href="/post">

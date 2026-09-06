@@ -43,6 +43,17 @@ DATABASE_URL="file:./prisma/dev.db"
 3. Run `npm run build` before committing
 4. If schema changed: migrate → update seed → seed → build
 
+## Moderation (demo)
+
+Moderators see **Moderation** in the header and can open `/moderation`.
+
+Access is granted when:
+
+1. `User.isModerator` is true (Joe is seeded this way), **or**
+2. The user id or slug is listed in `MODERATOR_USER_IDS` (comma-separated), e.g. `MODERATOR_USER_IDS=joe-martinez`.
+
+APIs never return phone numbers in the queue — display name + slug only. See [API.md](API.md) Reports section.
+
 ## Demo login
 
 Visit `/login`, enter a demo phone (e.g. `+15035550101` for Joe), and use the OTP shown in the UI (mock SMS — no Twilio needed). See [DEMO-PERSONAS.md](DEMO-PERSONAS.md).

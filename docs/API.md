@@ -187,7 +187,7 @@ Host only. Requires auth.
 
 ### `POST /api/reports`
 
-Requires auth.
+Requires auth. Creates a report with status `OPEN`.
 
 **Body:**
 ```json
@@ -197,6 +197,27 @@ Requires auth.
   "details": "optional context"
 }
 ```
+
+### `GET /api/reports?status=OPEN`
+
+Moderator only. Lists reports (newest first). Filter: `OPEN` | `REVIEWING` | `ACTIONED` | `DISMISSED` | `ALL` (default `OPEN`).
+
+Response includes listing title/slug/status, reporter **display name + slug only** (never phone), optional resolution fields.
+
+### `PATCH /api/reports/[id]`
+
+Moderator only. Update moderation state.
+
+**Body:**
+```json
+{
+  "status": "OPEN" | "REVIEWING" | "ACTIONED" | "DISMISSED",
+  "resolutionNote": "optional note",
+  "cancelListing": false
+}
+```
+
+When `cancelListing: true`, `status` must be `ACTIONED` — listing is set to `CANCELLED` (same semantics as host cancel; completed listings cannot be cancelled).
 
 ## Groups
 

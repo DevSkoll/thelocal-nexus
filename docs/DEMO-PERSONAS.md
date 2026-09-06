@@ -23,7 +23,8 @@ Sign in at `/login` with phone OTP — no password required.
 - **Tier:** VERIFIED_HOST
 - **Location:** Portland, OR (15 mi radius)
 - **Interests:** Cycling, Outdoors
-- **Test as:** Group admin, host dashboard, park hangout poster, makers meetup host
+- **Moderator:** yes (`isModerator` seeded; also allowlist via `MODERATOR_USER_IDS`)
+- **Test as:** Group admin, host dashboard, park hangout poster, makers meetup host, **moderation queue** (`/moderation`)
 
 ### Mira Chen — +15035550102
 
@@ -97,3 +98,4 @@ Sign in at `/login` with phone OTP — no password required.
 3. **Group join:** Login as Sam → `/groups/portland-urban-cyclists` → join
 4. **Messages:** View barn listing → see listing-scoped thread
 5. **Create listing:** Login as Joe → `/post` → set nature tag + interests
+6. **Moderation:** Login as Joe → `/moderation` → review seeded reports (dismiss / action / cancel listing)

@@ -25,7 +25,7 @@ Quick reference: [`.grok/references/schema-reference.md`](../.grok/references/sc
 | Rsvp | Per-listing attendance with approval flag |
 | Message | Listing-scoped public thread |
 | Announcement | Host updates on a listing |
-| Report | User moderation reports |
+| Report | User moderation reports (status, reviewer, resolution) |
 | Alert | Interest + radius notification preference |
 | SkillOffer | Neighbor skill advertising (sibling to Listing) |
 | ReputationEvent | Append-only trust ledger |
@@ -38,6 +38,8 @@ Quick reference: [`.grok/references/schema-reference.md`](../.grok/references/sc
 - **VerificationTier:** UNVERIFIED, VERIFIED_HOST (host trust only)
 - **phoneVerifiedAt / emailVerifiedAt:** account verification timestamps
 - **RsvpStatus:** INTERESTED, GOING, WAITLIST
+- **ReportStatus:** OPEN, REVIEWING, ACTIONED, DISMISSED
+- **User.isModerator:** demo/admin flag (Joe seeded true); also `MODERATOR_USER_IDS` env
 
 ## Migrations
 

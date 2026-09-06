@@ -23,6 +23,8 @@ Open [http://localhost:3000](http://localhost:3000). Sign in at `/login` with a 
 | [API.md](API.md) | REST endpoints reference |
 | [DESIGN.md](DESIGN.md) | Visual identity, UI conventions |
 | [DEMO-PERSONAS.md](DEMO-PERSONAS.md) | Seeded users, groups, listings |
+| [MODERATION.md](MODERATION.md) | Report queue, moderator gate, privacy |
+| [REPUTATION.md](REPUTATION.md) | Trust ledger and Verified Host |
 | [ROADMAP.md](ROADMAP.md) | Planned features and known gaps |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Docker demo server setup |
 
