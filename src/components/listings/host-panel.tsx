@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Pencil, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -23,6 +24,7 @@ interface Announcement {
 
 interface HostPanelProps {
   listingId: string;
+  listingSlug: string;
   listingStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
   rsvps: RsvpUser[];
   initialAnnouncements: Announcement[];
@@ -30,6 +32,7 @@ interface HostPanelProps {
 
 export function HostPanel({
   listingId,
+  listingSlug,
   listingStatus = "ACTIVE",
   rsvps,
   initialAnnouncements,
@@ -40,10 +43,13 @@ export function HostPanel({
   const [loading, setLoading] = useState<string | null>(null);
   const [status, setStatus] = useState(listingStatus);
   const [completeMessage, setCompleteMessage] = useState("");
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState("");
 
   const pending = rsvps.filter((r) => r.status === "GOING" && !r.approved);
   const going = rsvps.filter((r) => r.status === "GOING" && r.approved);
   const interested = rsvps.filter((r) => r.status === "INTERESTED");
+  const isActive = status === "ACTIVE";
 
   async function handleApprove(rsvpId: string, approved: boolean) {
     setLoading(rsvpId);
@@ -102,12 +108,94 @@ export function HostPanel({
     }
   }
 
+  async function cancelListing() {
+    setLoading("cancel");
+    setCancelMessage("");
+    try {
+      const res = await fetch("/api/listings/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listingId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to cancel");
+      setStatus("CANCELLED");
+      setCancelConfirmOpen(false);
+      setCancelMessage("Listing cancelled. History is preserved — it won’t show in discovery.");
+      router.refresh();
+    } catch (e) {
+      setCancelMessage(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setLoading(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border-2 border-sage/30 bg-sage/5 p-6">
         <h2 className="font-serif text-lg font-bold text-sage">Host dashboard</h2>
         <p className="text-sm text-ink-muted mt-1">Manage attendees and send updates to RSVPs.</p>
+        {isActive && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href={`/listings/${listingSlug}/edit`}>
+              <Button size="sm" variant="outline" className="rounded-xl">
+                <Pencil className="h-4 w-4" />
+                Edit listing
+              </Button>
+            </Link>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="rounded-xl text-terracotta hover:bg-terracotta/10"
+              onClick={() => {
+                setCancelConfirmOpen(true);
+                setCancelMessage("");
+              }}
+            >
+              <XCircle className="h-4 w-4" />
+              Cancel listing
+            </Button>
+          </div>
+        )}
       </div>
+
+      {cancelConfirmOpen && isActive && (
+        <div className="rounded-2xl border-2 border-terracotta/40 bg-terracotta/5 p-6 space-y-3">
+          <h3 className="font-semibold text-terracotta">Cancel this listing?</h3>
+          <p className="text-sm text-ink-muted leading-relaxed">
+            Neighbors will no longer see it in discovery. RSVPs, messages, and history stay on the
+            listing page — nothing is deleted. This can&apos;t be undone from here.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              className="rounded-xl bg-terracotta hover:bg-terracotta-dark"
+              disabled={loading === "cancel"}
+              onClick={cancelListing}
+            >
+              {loading === "cancel" ? "Cancelling..." : "Yes, cancel listing"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-xl"
+              disabled={loading === "cancel"}
+              onClick={() => setCancelConfirmOpen(false)}
+            >
+              Keep it active
+            </Button>
+          </div>
+          {cancelMessage && !cancelMessage.includes("cancelled") && (
+            <p className="text-sm font-medium text-terracotta">{cancelMessage}</p>
+          )}
+        </div>
+      )}
+
+      {cancelMessage && status === "CANCELLED" && (
+        <p className="rounded-2xl bg-stone/20 px-4 py-3 text-sm font-medium text-ink-muted">
+          {cancelMessage}
+        </p>
+      )}
 
       <div className="rounded-2xl border border-stone/60 bg-white p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -116,7 +204,9 @@ export function HostPanel({
             <p className="text-sm text-ink-muted mt-0.5">
               {status === "COMPLETED"
                 ? "Completed — trust awards applied (idempotent)."
-                : "When the meetup happened, mark it completed to credit trust."}
+                : status === "CANCELLED"
+                  ? "Cancelled — preserved for history, hidden from discovery."
+                  : "When the meetup happened, mark it completed to credit trust."}
             </p>
           </div>
           {status === "COMPLETED" ? (
@@ -125,7 +215,8 @@ export function HostPanel({
               Completed
             </span>
           ) : status === "CANCELLED" ? (
-            <span className="rounded-full bg-stone/20 text-ink-muted px-3 py-1.5 text-sm font-semibold">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-stone/20 text-ink-muted px-3 py-1.5 text-sm font-semibold">
+              <XCircle className="h-4 w-4" />
               Cancelled
             </span>
           ) : (

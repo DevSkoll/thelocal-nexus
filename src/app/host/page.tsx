@@ -64,6 +64,7 @@ export default async function HostPage() {
               </div>
               <HostPanel
                 listingId={listing.id}
+                listingSlug={listing.slug}
                 listingStatus={listing.status}
                 rsvps={listing.rsvps}
                 initialAnnouncements={listingAnnouncements}

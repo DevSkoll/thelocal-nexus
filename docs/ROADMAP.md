@@ -23,7 +23,7 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [ ] Email OTP as secondary verification
 - [ ] SMS notifications for alerts and RSVP updates
 - [x] Reputation points and automatic Verified Host promotion
-- [ ] Listing edit and cancel (host)
+- [x] Listing edit and cancel (host)
 - [ ] Group creation flow
 - [ ] Admin moderation queue for reports
 - [ ] Postgres migration path (replace SQLite for production)

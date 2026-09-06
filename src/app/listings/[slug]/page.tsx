@@ -148,10 +148,25 @@ export default async function ListingPage({ params }: ListingPageProps) {
         </div>
       )}
 
+      {listing.status !== "ACTIVE" && (
+        <div
+          className={
+            listing.status === "CANCELLED"
+              ? "mt-6 rounded-2xl border border-stone/60 bg-stone/15 px-4 py-3 text-sm font-medium text-ink-muted"
+              : "mt-6 rounded-2xl border border-sage/30 bg-sage/5 px-4 py-3 text-sm font-medium text-sage"
+          }
+        >
+          {listing.status === "CANCELLED"
+            ? "This listing was cancelled by the host. History is preserved."
+            : "This listing is marked completed."}
+        </div>
+      )}
+
       {isHost && (
         <div className="mt-8">
           <HostPanel
             listingId={listing.id}
+            listingSlug={listing.slug}
             listingStatus={listing.status}
             rsvps={listing.rsvps}
             initialAnnouncements={listing.announcements.map((a) => ({

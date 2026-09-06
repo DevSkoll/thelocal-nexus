@@ -60,6 +60,39 @@ Create a listing. Requires verified phone (403 if not).
 
 **Response:** `{ slug, id }`
 
+### `PATCH /api/listings/:id`
+
+Update an active listing. Host only. Requires verified phone.
+
+**Body:** Same editable fields as create (title, description, location, times, capacity, prices, RSVP flags, natureTag, interestSlugs, type). Does not change poster, slug, or status.
+
+**Rules:**
+- 403 if not the listing host
+- 400 if listing is not ACTIVE
+
+**Response:** `{ ok: true, slug, id }`
+
+### `POST /api/listings/cancel`
+
+Cancel a listing (status → CANCELLED). Host only. Idempotent. Does not delete history.
+
+**Body:** `{ "listingId": "<cuid>" }`
+
+**Rules:**
+- Already CANCELLED → `{ ok: true, status: "CANCELLED" }`
+- COMPLETED → 400
+- Preserves RSVPs, messages, announcements
+
+**Response:** `{ ok: true, status: "CANCELLED" }`
+
+### `POST /api/listings/complete`
+
+Mark listing COMPLETED and award EVENT_HOSTED / EVENT_COMPLETED reputation. Host only. Idempotent awards.
+
+**Body:** `{ "listingId": "<cuid>" }`
+
+**Response:** `{ ok: true, status: "COMPLETED", awarded: boolean }`
+
 ## RSVP
 
 ### `POST /api/rsvp`
