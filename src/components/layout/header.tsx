@@ -40,6 +40,12 @@ export async function Header() {
               Discover
             </Link>
             <Link
+              href="/groups"
+              className="hidden md:flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              Groups
+            </Link>
+            <Link
               href="/skills"
               className="hidden md:flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
             >

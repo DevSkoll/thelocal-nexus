@@ -87,11 +87,16 @@ export default async function SettingsPage() {
       </section>
 
       <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <h2 className="font-serif text-lg font-semibold">Your groups</h2>
-          <Link href="/host" className="text-sm text-sage hover:underline font-medium">
-            Host dashboard →
-          </Link>
+          <div className="flex flex-wrap gap-3 text-sm font-medium">
+            <Link href="/groups/new" className="text-terracotta hover:underline">
+              Create a group
+            </Link>
+            <Link href="/groups" className="text-sage hover:underline">
+              Browse →
+            </Link>
+          </div>
         </div>
         <div className="mt-4 space-y-2">
           {groups.length === 0 && (

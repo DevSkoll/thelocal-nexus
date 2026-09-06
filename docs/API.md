@@ -221,6 +221,29 @@ When `cancelListing: true`, `status` must be `ACTIONED` — listing is set to `C
 
 ## Groups
 
+### `POST /api/groups`
+
+Requires phone-verified auth. Creates a group and adds the creator as `ADMIN`.
+
+**Body:**
+```json
+{
+  "name": "string (3–120)",
+  "description": "string (10–5000)",
+  "type": "COMMUNITY" | "ORGANIZATION" | "BUSINESS",
+  "latitude": 45.52,
+  "longitude": -122.67,
+  "locationLabel": "Portland, OR",
+  "coverImageUrl": "https://…"
+}
+```
+
+Location and cover fields are optional. Slug is derived from `name` and made unique. Returns `{ slug, id }`.
+
+### `GET /api/groups`
+
+Lists groups. Query: `lat`, `lng`, `radiusMiles`, `type`, `q`.
+
 ### `POST /api/groups/join`
 
 Requires auth.

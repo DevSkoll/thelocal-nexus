@@ -24,7 +24,7 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [ ] SMS notifications for alerts and RSVP updates
 - [x] Reputation points and automatic Verified Host promotion
 - [x] Listing edit and cancel (host)
-- [ ] Group creation flow
+- [x] Group creation flow
 - [x] Admin moderation queue for reports
 - [ ] Postgres migration path (replace SQLite for production)
 
