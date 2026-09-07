@@ -1,5 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
+
+const THEITGURU_URL = "https://theit.guru";
+const GROKBOT_URL = "https://x.ai/bot";
 
 export function Footer() {
   return (
@@ -31,6 +35,43 @@ export function Footer() {
             Intentionally AI-built — helping businesses, communities, and people connect in real life.{" "}
             <Link href="/about" className="underline hover:text-white/80">Learn more</Link>
           </p>
+
+          <div className="mt-6 rounded-2xl border border-white/15 bg-white/10 px-4 py-4 sm:px-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-white/60">
+                Built with
+              </p>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+                <a
+                  href={THEITGURU_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 rounded-full bg-cream/95 px-3 py-1.5 text-sage shadow-sm transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+                >
+                  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center" aria-hidden="true">
+                    <Image src="/brands/theitguru.svg" alt="" width={28} height={28} className="h-7 w-7" unoptimized />
+                  </span>
+                  <span className="text-sm font-semibold text-sage">TheITGuru</span>
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+                <a
+                  href={GROKBOT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 rounded-full bg-cream/95 px-3 py-1.5 text-sage shadow-sm transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+                >
+                  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center" aria-hidden="true">
+                    <Image src="/brands/grokbot.svg" alt="" width={28} height={28} className="h-7 w-7" unoptimized />
+                  </span>
+                  <span className="flex min-w-0 flex-col leading-tight">
+                    <span className="text-sm font-semibold text-sage">Grok Bot</span>
+                    <span className="text-[11px] font-medium text-terracotta">Generative application development</span>
+                  </span>
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
