@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { haversineDistance, slugify } from "@/lib/utils";
 import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
+import { resolveInterestsBySlugs } from "@/lib/interests";
 import type { SkillOfferStatus } from "@/generated/prisma/client";
 
 export type SkillFilters = {
@@ -119,10 +120,7 @@ export type CreateSkillOfferInput = {
 };
 
 export async function createSkillOffer(userId: string, input: CreateSkillOfferInput) {
-  const interests = await db.interest.findMany({
-    where: { slug: { in: input.interestSlugs } },
-  });
-  if (interests.length === 0) throw new Error("Select at least one interest");
+  const interests = await resolveInterestsBySlugs(input.interestSlugs);
 
   let slug = slugify(input.title);
   const existing = await db.skillOffer.findUnique({ where: { slug } });
@@ -175,15 +173,11 @@ export async function updateSkillOffer(
   if (offer.userId !== userId) return { error: "forbidden" as const };
 
   if (input.interestSlugs) {
-    const interests = await db.interest.findMany({
-      where: { slug: { in: input.interestSlugs } },
-    });
+    const interests = await resolveInterestsBySlugs(input.interestSlugs);
     await db.skillOfferInterest.deleteMany({ where: { skillOfferId: offer.id } });
-    if (interests.length > 0) {
-      await db.skillOfferInterest.createMany({
-        data: interests.map((i) => ({ skillOfferId: offer.id, interestId: i.id })),
-      });
-    }
+    await db.skillOfferInterest.createMany({
+      data: interests.map((i) => ({ skillOfferId: offer.id, interestId: i.id })),
+    });
   }
 
   const updated = await db.skillOffer.update({

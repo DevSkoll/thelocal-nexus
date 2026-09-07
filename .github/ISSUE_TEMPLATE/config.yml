@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Product principles
+    url: https://github.com/DevSkoll/thelocal-nexus/blob/main/docs/PRODUCT.md
+    about: What we build — and what we will not.
+  - name: Security report
+    url: https://github.com/DevSkoll/thelocal-nexus/security/advisories/new
+    about: Privately report a vulnerability. Do not file a public issue.

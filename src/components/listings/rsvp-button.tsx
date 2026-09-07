@@ -18,7 +18,6 @@ interface RsvpButtonProps {
 
 export function RsvpButton({
   listingId,
-  listingSlug,
   rsvpRequired,
   rsvpApprovalRequired,
   homeHosted,

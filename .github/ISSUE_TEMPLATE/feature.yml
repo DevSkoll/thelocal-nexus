@@ -1,0 +1,31 @@
+name: Feature
+description: Propose something that helps neighbors meet in real life
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read [PRODUCT.md](https://github.com/DevSkoll/thelocal-nexus/blob/main/docs/PRODUCT.md) first.
+        We will not take algorithmic feeds, pay-to-boost, follower graphs, global DMs, or vanity metrics.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: Who is stuck, and in what real-world situation?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      placeholder: The smallest change that would help. Listings stay the unit of content.
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Principles
+      options:
+        - label: This is not a feed, boost, vanity metric, or global DM
+          required: true

@@ -17,7 +17,11 @@ npm run dev          # http://localhost:3000
 
 ## Environment
 
-Default database URL is `file:./prisma/dev.db`. Override with `.env`:
+Default database URL is `file:./prisma/dev.db`. Copy the template and edit locally — **never commit `.env`**:
+
+```
+cp .env.example .env
+```
 
 ```
 DATABASE_URL="file:./prisma/dev.db"
@@ -35,6 +39,8 @@ DATABASE_URL="file:./prisma/dev.db"
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run ci` | lint + typecheck + build |
 | `npm run db:setup` | Migrate + seed |
 | `npm run db:migrate` | `prisma migrate dev` |
 | `npm run db:generate` | Regenerate Prisma client |

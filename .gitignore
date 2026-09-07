@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — never commit secrets. Keep the template.
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -41,14 +43,19 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
-.env
 
-# local sqlite
-prisma/dev.db
-prisma/dev.db-journal
+# local sqlite and runtime data (never publish community data)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
 prisma/*.db
+prisma/*.db-*
+
 # User-uploaded avatars and covers (local demo storage)
 public/uploads/**
 !public/uploads/.gitkeep
+data/**
+!data/uploads/
 data/uploads/**
 !data/uploads/.gitkeep

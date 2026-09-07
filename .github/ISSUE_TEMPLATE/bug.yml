@@ -1,0 +1,52 @@
+name: Bug
+description: Something is broken
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping. Do **not** include phone numbers, session cookies, or production database dumps.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      placeholder: What you expected vs what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to …
+        2. Click …
+        3. See …
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where
+      options:
+        - Discover / listings
+        - Auth / login
+        - Groups
+        - Skills
+        - Profiles
+        - Host / RSVP
+        - Moderation
+        - Suggestions
+        - Deploy / Docker
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "e.g. npm run dev on Node 20, or Docker demo"
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context
+      placeholder: Screenshots, logs with secrets redacted, related PRs.

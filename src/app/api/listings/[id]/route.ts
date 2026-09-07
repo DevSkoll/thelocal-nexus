@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePhoneVerified } from "@/lib/auth";
 import { isListingHost } from "@/lib/host";
+import { resolveInterestsBySlugs } from "@/lib/interests";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -117,11 +118,14 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     const body = await req.json();
     const data = updateListingSchema.parse(body);
 
-    const interests = await db.interest.findMany({
-      where: { slug: { in: data.interestSlugs } },
-    });
-    if (interests.length === 0) {
-      return NextResponse.json({ error: "Select at least one interest" }, { status: 400 });
+    let interests;
+    try {
+      interests = await resolveInterestsBySlugs(data.interestSlugs);
+    } catch (interestErr) {
+      return NextResponse.json(
+        { error: interestErr instanceof Error ? interestErr.message : "Select at least one interest" },
+        { status: 400 }
+      );
     }
 
     let priceMin: number | null = null;

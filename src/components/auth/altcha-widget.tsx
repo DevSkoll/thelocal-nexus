@@ -35,7 +35,10 @@ const widgetStyle = {
 export function AltchaWidget({ onPayloadChange, className }: Props) {
   const ref = useRef<(HTMLElement & WidgetMethods) | null>(null);
   const onPayloadChangeRef = useRef(onPayloadChange);
-  onPayloadChangeRef.current = onPayloadChange;
+
+  useEffect(() => {
+    onPayloadChangeRef.current = onPayloadChange;
+  }, [onPayloadChange]);
 
   useEffect(() => {
     const el = ref.current;

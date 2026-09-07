@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { MapPin, Users, ShieldCheck } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ListingTags } from "./listing-tags";
 import { formatListingDate, formatVerification } from "@/lib/format";
 import { formatDistance } from "@/lib/utils";
@@ -36,6 +35,7 @@ export function ListingCard({ listing }: { listing: ListingWithRelations }) {
           priceMin={listing.priceMin}
           priceMax={listing.priceMax}
           natureTag={listing.natureTag}
+          interests={listing.interests.map(({ interest }) => interest)}
         />
         {listing.distance != null && (
           <span className="text-xs text-ink-muted whitespace-nowrap shrink-0">
@@ -49,14 +49,6 @@ export function ListingCard({ listing }: { listing: ListingWithRelations }) {
       </h3>
 
       <p className="mt-2 text-sm text-ink-muted line-clamp-2">{listing.description}</p>
-
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {listing.interests.slice(0, 3).map(({ interest }) => (
-          <Badge key={interest.id} variant="interest">
-            {interest.icon} {interest.name}
-          </Badge>
-        ))}
-      </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-muted">
         <span className="flex items-center gap-1">

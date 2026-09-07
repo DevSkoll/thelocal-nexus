@@ -1,12 +1,25 @@
 {
-  "name": "communityhub",
+  "name": "thelocal-nexus",
   "version": "0.1.0",
   "private": true,
+  "description": "Location-first community hub. Listings, not feeds.",
+  "homepage": "https://github.com/DevSkoll/thelocal-nexus",
+  "bugs": {
+    "url": "https://github.com/DevSkoll/thelocal-nexus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevSkoll/thelocal-nexus.git"
+  },
+  "license": "MIT",
+  "author": "Dev_Skoll",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "ci": "npm run lint && npm run typecheck && npm run build",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "npx tsx prisma/seed.ts",

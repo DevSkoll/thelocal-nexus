@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, Users, ShieldCheck, Home, Share2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ListingTags } from "@/components/listings/listing-tags";
 import { RsvpButton } from "@/components/listings/rsvp-button";
 import { HostPanel } from "@/components/listings/host-panel";
@@ -74,22 +73,13 @@ export default async function ListingPage({ params }: ListingPageProps) {
         natureTag={listing.natureTag}
         listingType={listing.type}
         showListingType
+        interests={listing.interests.map(({ interest }) => interest)}
         className="mb-4"
       />
 
       <h1 className="font-serif text-3xl sm:text-4xl font-bold text-ink leading-tight">
         {listing.title}
       </h1>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {listing.interests.map(({ interest }) => (
-          <Link key={interest.id} href={`/discover?category=${interest.slug}`}>
-            <Badge variant="interest">
-              {interest.icon} {interest.name}
-            </Badge>
-          </Link>
-        ))}
-      </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-muted">
         <span className="flex items-center gap-1.5">

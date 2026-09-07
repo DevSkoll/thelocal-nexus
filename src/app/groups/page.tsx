@@ -42,7 +42,7 @@ export default async function GroupsPage({ searchParams }: GroupsPageProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
-      <div className="mb-6 rounded-[2rem] bg-gradient-to-br from-sage to-sage-dark text-white p-6 sm:p-8 shadow-lg brand-hero">
+      <div className="mb-6 rounded-[2rem] bg-gradient-to-br from-sage to-sage-dark text-white p-6 sm:p-8 shadow-lg">
         <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
           <Users className="h-4 w-4" />
           Community groups

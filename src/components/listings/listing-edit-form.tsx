@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LISTING_TYPES, LISTING_CATEGORIES, LISTING_NATURE_TAGS } from "@/lib/constants";
+import { RecurrenceFields } from "@/components/listings/recurrence-fields";
 import { cn } from "@/lib/utils";
 
 export type ListingEditInitial = {
@@ -186,15 +187,11 @@ export function ListingEditForm({ initial }: { initial: ListingEditInitial }) {
             />
           </div>
         </div>
-        <div>
-          <label className="text-sm font-medium text-ink-muted">Recurrence (optional)</label>
-          <Input
-            className="mt-1 rounded-2xl"
-            value={form.recurrenceRule}
-            onChange={(e) => update("recurrenceRule", e.target.value)}
-            placeholder="weekly:saturday:09:00"
-          />
-        </div>
+        <RecurrenceFields
+          value={form.recurrenceRule}
+          onChange={(rule) => update("recurrenceRule", rule)}
+          optional={form.type !== "RECURRING_EVENT"}
+        />
       </section>
 
       <section className="rounded-3xl border border-stone/60 bg-white p-6 space-y-4 shadow-sm">
@@ -352,7 +349,7 @@ export function ListingEditForm({ initial }: { initial: ListingEditInitial }) {
 
       <section className="rounded-3xl border border-stone/60 bg-white p-6 space-y-3 shadow-sm">
         <h2 className="font-serif text-lg font-semibold">Interest tags</h2>
-        <p className="text-sm text-ink-muted">Help people find this gathering.</p>
+        <p className="text-sm text-ink-muted">Select every topic that fits. All of them show on the listing.</p>
         <div className="flex flex-wrap gap-2">
           {LISTING_CATEGORIES.map((cat) => (
             <button

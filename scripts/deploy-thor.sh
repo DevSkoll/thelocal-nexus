@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Maintainer deploy helper for the existing demo host.
+# Contributors: use docker compose locally — see docs/DEPLOYMENT.md.
 # Deploy TheLocal.nexus demo to Thor (192.168.50.11)
 set -euo pipefail
 

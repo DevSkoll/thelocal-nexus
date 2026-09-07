@@ -3,6 +3,8 @@ export const APP_TAGLINE = "What's happening near you";
 export const APP_DESCRIPTION =
   "A community hub for real-world connection — find events, groups, and gatherings near you.";
 export const APP_DOMAIN = "thelocal.nexus";
+export const GITHUB_REPO = "DevSkoll/thelocal-nexus";
+export const GITHUB_URL = `https://github.com/${GITHUB_REPO}`;
 
 export const LISTING_TYPES = [
   { value: "ONE_TIME_EVENT", label: "One-time event", description: "Concerts, cleanups, game nights" },

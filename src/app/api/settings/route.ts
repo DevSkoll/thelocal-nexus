@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { geocodeZip } from "@/lib/geo/zip";
 import { setAreaCookie, type AreaPreference } from "@/lib/location";
+import { resolveInterestsBySlugs } from "@/lib/interests";
 
 const settingsSchema = z.object({
   name: z.string().min(1).max(80).optional(),
@@ -21,11 +22,9 @@ export async function PATCH(req: NextRequest) {
     const data = settingsSchema.parse(body);
 
     if (data.interestSlugs) {
-      const interests = await db.interest.findMany({
-        where: { slug: { in: data.interestSlugs } },
-      });
       await db.userInterest.deleteMany({ where: { userId: user.id } });
-      if (interests.length > 0) {
+      if (data.interestSlugs.length > 0) {
+        const interests = await resolveInterestsBySlugs(data.interestSlugs);
         await db.userInterest.createMany({
           data: interests.map((i) => ({ userId: user.id, interestId: i.id })),
         });

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LISTING_TYPES, LISTING_CATEGORIES, LISTING_NATURE_TAGS } from "@/lib/constants";
+import { RecurrenceFields } from "@/components/listings/recurrence-fields";
 import { cn } from "@/lib/utils";
 
 interface PostFormProps {
@@ -79,6 +80,7 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId, 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to create listing");
       router.push(`/listings/${data.slug}`);
+      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -115,9 +117,15 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId, 
               <button
                 key={type.value}
                 onClick={() => {
-                  update("type", type.value);
-                  const needsRsvp = !["HANGOUT_SPOT", "GROUP_SEEKING", "LOOKING_FOR"].includes(type.value);
-                  update("rsvpRequired", needsRsvp);
+                  setForm((prev) => ({
+                    ...prev,
+                    type: type.value,
+                    rsvpRequired: !["HANGOUT_SPOT", "GROUP_SEEKING", "LOOKING_FOR"].includes(type.value),
+                    recurrenceRule:
+                      type.value === "RECURRING_EVENT" && !prev.recurrenceRule
+                        ? "weekly:saturday:09:00"
+                        : prev.recurrenceRule,
+                  }));
                   setStep(2);
                 }}
                 className={cn(
@@ -227,15 +235,11 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId, 
           )}
 
           {["RECURRING_EVENT", "HANGOUT_SPOT"].includes(form.type) && (
-            <div>
-              <label className="text-sm text-ink-muted">Recurrence (e.g. weekly:saturday:09:00)</label>
-              <Input
-                className="mt-1"
-                value={form.recurrenceRule}
-                onChange={(e) => update("recurrenceRule", e.target.value)}
-                placeholder="weekly:saturday:09:00"
-              />
-            </div>
+            <RecurrenceFields
+              value={form.recurrenceRule}
+              onChange={(rule) => update("recurrenceRule", rule)}
+              optional={form.type !== "RECURRING_EVENT"}
+            />
           )}
 
           <div className="flex gap-2">
@@ -293,7 +297,7 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId, 
 
           <div>
             <label className="text-sm font-medium text-ink-muted">What best describes this?</label>
-            <p className="text-xs text-ink-muted mt-0.5 mb-2">Helps people know the scale and who&apos;s hosting.</p>
+            <p className="text-xs text-ink-muted mt-0.5 mb-2">Pick one — the scale and who&apos;s hosting.</p>
             <div className="grid gap-2">
               {LISTING_NATURE_TAGS.map((tag) => (
                 <button
@@ -417,16 +421,19 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId, 
       {step === 5 && (
         <div className="space-y-4">
           <h2 className="font-serif text-xl font-semibold">Interest tags</h2>
-          <p className="text-sm text-ink-muted">Help people find your listing.</p>
+          <p className="text-sm text-ink-muted">Select every topic that fits. All of them show on the listing.</p>
           <div className="flex flex-wrap gap-2">
             {LISTING_CATEGORIES.map((cat) => (
               <button
                 key={cat.slug}
+                type="button"
                 onClick={() => {
-                  const slugs = form.interestSlugs.includes(cat.slug)
-                    ? form.interestSlugs.filter((s) => s !== cat.slug)
-                    : [...form.interestSlugs, cat.slug];
-                  update("interestSlugs", slugs);
+                  setForm((prev) => ({
+                    ...prev,
+                    interestSlugs: prev.interestSlugs.includes(cat.slug)
+                      ? prev.interestSlugs.filter((s) => s !== cat.slug)
+                      : [...prev.interestSlugs, cat.slug],
+                  }));
                 }}
                 className={cn(
                   "rounded-full px-3 py-1.5 text-sm transition-colors",

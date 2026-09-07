@@ -1,6 +1,6 @@
 # TheLocal.nexus — Agent Instructions
 
-You are working on **TheLocal.nexus** (`communityhub`), a location-first community hub for real-world connection. Read this file and `.grok/rules/` before making changes.
+You are working on **TheLocal.nexus** (`thelocal-nexus`), a location-first community hub for real-world connection. Read this file before making changes. Public source: `https://github.com/DevSkoll/thelocal-nexus`.
 
 ## Product north star
 

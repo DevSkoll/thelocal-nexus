@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Sparkles, Users, Building2, Heart } from "lucide-react";
-import { APP_NAME } from "@/lib/constants";
+import { APP_NAME, GITHUB_URL } from "@/lib/constants";
 
 export const metadata = {
   title: `About · ${APP_NAME}`,
@@ -49,6 +49,10 @@ export default function AboutPage() {
           <Link href="/safety" className="text-terracotta font-semibold hover:underline">Safety &amp; trust</Link>
           {" "}or browse{" "}
           <Link href="/skills" className="text-terracotta font-semibold hover:underline">skills near you</Link>.
+          Source is public —{" "}
+          <a href={GITHUB_URL} className="text-terracotta font-semibold hover:underline" target="_blank" rel="noopener noreferrer">
+            contribute on GitHub
+          </a>.
         </p>
       </div>
     </div>

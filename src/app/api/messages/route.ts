@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { getCurrentUser, requirePhoneVerified } from "@/lib/auth";
+import { requirePhoneVerified } from "@/lib/auth";
 
 const messageSchema = z.object({
   listingId: z.string(),

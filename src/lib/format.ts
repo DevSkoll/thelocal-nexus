@@ -1,5 +1,6 @@
 import { format, formatDistanceToNow } from "date-fns";
 import { LISTING_TYPES, LISTING_NATURE_TAGS } from "./constants";
+import { formatRecurrenceRule } from "./recurrence";
 import type { ListingType, ListingNatureTag, VerificationTier, GroupVerification } from "@/generated/prisma/client";
 
 export function formatListingType(type: ListingType): string {
@@ -40,12 +41,8 @@ export function formatListingDate(
   endsAt: Date | null,
   recurrenceRule: string | null
 ): string {
-  if (recurrenceRule) {
-    const parts = recurrenceRule.split(":");
-    const day = parts[1] ? parts[1].charAt(0).toUpperCase() + parts[1].slice(1) : "";
-    const time = parts[2] ? formatTime(parts[2]) : "";
-    return `Every ${day}${time ? ` at ${time}` : ""}`;
-  }
+  const recurrence = formatRecurrenceRule(recurrenceRule);
+  if (recurrence) return recurrence;
   if (!startsAt) return "Ongoing";
   const start = format(startsAt, "EEE, MMM d");
   const time = format(startsAt, "h:mm a");
@@ -54,15 +51,6 @@ export function formatListingDate(
     return `${start} · ${time} – ${endTime}`;
   }
   return `${start} · ${time}`;
-}
-
-function formatTime(time: string): string {
-  const [hStr, mStr] = time.split(":");
-  const h = Number(hStr);
-  const m = mStr != null ? Number(mStr) : 0;
-  const period = h >= 12 ? "PM" : "AM";
-  const hour = h % 12 || 12;
-  return `${hour}:${m.toString().padStart(2, "0")} ${period}`;
 }
 
 export function formatVerification(

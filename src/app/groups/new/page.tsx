@@ -52,7 +52,7 @@ export default async function NewGroupPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:py-10">
-      <div className="mb-8 rounded-[2rem] bg-gradient-to-br from-sage to-sage-dark text-white p-6 sm:p-8 shadow-lg brand-hero">
+      <div className="mb-8 rounded-[2rem] bg-gradient-to-br from-sage to-sage-dark text-white p-6 sm:p-8 shadow-lg">
         <p className="text-white/80 text-sm font-medium">Groups</p>
         <h1 className="mt-1 font-serif text-3xl sm:text-4xl font-bold">Start something local</h1>
         <p className="mt-2 text-white/85 max-w-lg leading-relaxed">

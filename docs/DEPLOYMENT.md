@@ -11,7 +11,7 @@ Run TheLocal.nexus on a demo server with Docker Compose. SQLite data persists in
 
 ```bash
 # From project root
-cp docker/.env.demo .env   # optional — defaults work
+cp .env.example .env   # then set ALTCHA_HMAC_KEY on any shared host
 docker compose up -d --build
 ```
 

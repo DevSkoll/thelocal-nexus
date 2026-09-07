@@ -253,6 +253,7 @@ export default async function PublicProfilePage({ params }: ProfilePageProps) {
                     priceMax={listing.priceMax}
                     natureTag={listing.natureTag}
                     listingType={listing.type}
+                    interests={listing.interests.map(({ interest }) => interest)}
                     className="mb-2"
                   />
                   <h3 className="font-serif text-lg font-bold">{listing.title}</h3>

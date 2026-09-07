@@ -12,6 +12,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). Sign in at `/login` with a demo persona.
 
+Public source: [github.com/DevSkoll/thelocal-nexus](https://github.com/DevSkoll/thelocal-nexus). See [CONTRIBUTING.md](../CONTRIBUTING.md) to send a change.
+
 ## Documentation index
 
 | Doc | Contents |
@@ -30,5 +32,6 @@ Open [http://localhost:3000](http://localhost:3000). Sign in at `/login` with a 
 
 ## Agent documentation
 
-- [`AGENTS.md`](../AGENTS.md) — primary instructions for AI agents
-- [`.grok/`](../.grok/) — Grok workspace config, rules, skills, references
+- [`AGENTS.md`](../AGENTS.md) — primary instructions for coding agents
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — human contributor workflow
+- [`SECURITY.md`](../SECURITY.md) — vulnerability reports

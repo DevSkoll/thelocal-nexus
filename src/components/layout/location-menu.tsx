@@ -23,11 +23,6 @@ export function LocationMenu({ area }: LocationMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setZip(area.zipCode);
-    setRadius(area.radiusMiles);
-  }, [area.zipCode, area.radiusMiles]);
-
-  useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
         setOpen(false);
@@ -62,7 +57,14 @@ export function LocationMenu({ area }: LocationMenuProps) {
     <div className="relative" ref={panelRef}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (!open) {
+            setZip(area.zipCode);
+            setRadius(area.radiusMiles);
+            setError(null);
+          }
+          setOpen((o) => !o);
+        }}
         className="flex items-center gap-1.5 rounded-lg px-2 sm:px-3 py-2 text-sm text-white/90 hover:text-white hover:bg-white/10 transition-colors max-w-[200px] sm:max-w-none"
         aria-expanded={open}
       >

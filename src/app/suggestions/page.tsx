@@ -50,7 +50,7 @@ export default async function SuggestionsPage({ searchParams }: SuggestionsPageP
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
-      <div className="mb-6 rounded-[2rem] bg-gradient-to-br from-sage to-sage-dark text-white p-6 sm:p-8 shadow-lg brand-hero relative overflow-hidden">
+      <div className="mb-6 rounded-[2rem] bg-gradient-to-br from-sage to-sage-dark text-white p-6 sm:p-8 shadow-lg relative overflow-hidden">
         <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
         <div className="absolute -left-4 bottom-0 h-20 w-20 rounded-full bg-terracotta/20 blur-xl" />
         <div className="relative">

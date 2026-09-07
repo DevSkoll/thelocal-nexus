@@ -26,7 +26,7 @@ const OWN_PROFILE_SELECT = {
 } as const;
 
 export async function ensureUniqueUserSlug(base: string, excludeUserId?: string) {
-  let slug = slugify(base) || "member";
+  const slug = slugify(base) || "member";
   let candidate = slug;
   let n = 0;
   while (true) {

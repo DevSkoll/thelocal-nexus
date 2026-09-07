@@ -70,10 +70,13 @@ export function LoginForm() {
         return;
       }
       if (data.user?.isNew) {
+        // Cookie is set; refresh the server Header while they pick a display name.
+        router.refresh();
         setStep("name");
         return;
       }
-      router.push("/discover");
+      // Full navigation so the layout Header re-reads the session cookie.
+      window.location.assign("/discover");
     } finally {
       setLoading(false);
     }
@@ -94,7 +97,7 @@ export function LoginForm() {
         setError(data.error ?? "Failed to save name");
         return;
       }
-      router.push("/discover");
+      window.location.assign("/discover");
     } finally {
       setLoading(false);
     }

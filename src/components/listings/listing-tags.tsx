@@ -9,6 +9,7 @@ interface ListingTagsProps {
   natureTag: ListingNatureTag;
   listingType?: ListingType;
   showListingType?: boolean;
+  interests?: { slug?: string; name: string; icon?: string | null }[];
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export function ListingTags({
   natureTag,
   listingType,
   showListingType = false,
+  interests,
   className,
 }: ListingTagsProps) {
   const priceLabel = formatPriceRange(priceMin, priceMax);
@@ -35,6 +37,12 @@ export function ListingTags({
         {showListingType && listingType && (
           <Badge variant="type">{formatListingType(listingType)}</Badge>
         )}
+        {interests?.map((interest) => (
+          <Badge key={interest.slug ?? interest.name} variant="interest">
+            {interest.icon ? `${interest.icon} ` : null}
+            {interest.name}
+          </Badge>
+        ))}
       </div>
     </div>
   );
