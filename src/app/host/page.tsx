@@ -66,6 +66,8 @@ export default async function HostPage() {
                 listingId={listing.id}
                 listingSlug={listing.slug}
                 listingStatus={listing.status}
+                startsAt={listing.startsAt?.toISOString() ?? null}
+                endsAt={listing.endsAt?.toISOString() ?? null}
                 rsvps={listing.rsvps}
                 initialAnnouncements={listingAnnouncements}
               />

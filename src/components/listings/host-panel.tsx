@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Pencil, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { listingCompletionBlockReason } from "@/lib/listing-completion";
 
 interface RsvpUser {
   id: string;
@@ -26,6 +27,8 @@ interface HostPanelProps {
   listingId: string;
   listingSlug: string;
   listingStatus?: "ACTIVE" | "COMPLETED" | "CANCELLED";
+  startsAt?: string | null;
+  endsAt?: string | null;
   rsvps: RsvpUser[];
   initialAnnouncements: Announcement[];
 }
@@ -34,6 +37,8 @@ export function HostPanel({
   listingId,
   listingSlug,
   listingStatus = "ACTIVE",
+  startsAt = null,
+  endsAt = null,
   rsvps,
   initialAnnouncements,
 }: HostPanelProps) {
@@ -43,6 +48,7 @@ export function HostPanel({
   const [loading, setLoading] = useState<string | null>(null);
   const [status, setStatus] = useState(listingStatus);
   const [completeMessage, setCompleteMessage] = useState("");
+  const [completeIsError, setCompleteIsError] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [cancelMessage, setCancelMessage] = useState("");
 
@@ -50,6 +56,8 @@ export function HostPanel({
   const going = rsvps.filter((r) => r.status === "GOING" && r.approved);
   const interested = rsvps.filter((r) => r.status === "INTERESTED");
   const isActive = status === "ACTIVE";
+  const tooEarlyReason = isActive ? listingCompletionBlockReason(startsAt, endsAt) : null;
+  const canMarkCompleted = isActive && !tooEarlyReason;
 
   async function handleApprove(rsvpId: string, approved: boolean) {
     setLoading(rsvpId);
@@ -81,27 +89,35 @@ export function HostPanel({
 
   async function markCompleted() {
     if (status === "COMPLETED") return;
+    if (tooEarlyReason) {
+      setCompleteIsError(true);
+      setCompleteMessage(tooEarlyReason);
+      return;
+    }
     if (
       !window.confirm(
-        "Mark this listing completed? You’ll earn EVENT_HOSTED trust, and approved attendees earn EVENT_COMPLETED."
+        "Mark this listing completed? You'll earn EVENT_HOSTED trust, and approved attendees earn EVENT_COMPLETED."
       )
     ) {
       return;
     }
     setLoading("complete");
     setCompleteMessage("");
+    setCompleteIsError(false);
     try {
       const res = await fetch("/api/listings/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ listingId }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Failed to complete");
       setStatus("COMPLETED");
+      setCompleteIsError(false);
       setCompleteMessage("Marked completed — reputation ledger updated.");
       router.refresh();
     } catch (e) {
+      setCompleteIsError(true);
       setCompleteMessage(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setLoading(null);
@@ -117,11 +133,11 @@ export function HostPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ listingId }),
       });
-      const data = await res.json();
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Failed to cancel");
       setStatus("CANCELLED");
       setCancelConfirmOpen(false);
-      setCancelMessage("Listing cancelled. History is preserved — it won’t show in discovery.");
+      setCancelMessage("Listing cancelled. History is preserved — it won't show in discovery.");
       router.refresh();
     } catch (e) {
       setCancelMessage(e instanceof Error ? e.message : "Something went wrong");
@@ -206,7 +222,9 @@ export function HostPanel({
                 ? "Completed — trust awards applied (idempotent)."
                 : status === "CANCELLED"
                   ? "Cancelled — preserved for history, hidden from discovery."
-                  : "When the meetup happened, mark it completed to credit trust."}
+                  : tooEarlyReason
+                    ? tooEarlyReason
+                    : "When the meetup happened, mark it completed to credit trust."}
             </p>
           </div>
           {status === "COMPLETED" ? (
@@ -224,7 +242,8 @@ export function HostPanel({
               size="sm"
               variant="secondary"
               className="rounded-xl"
-              disabled={loading === "complete"}
+              disabled={loading === "complete" || !canMarkCompleted}
+              title={tooEarlyReason ?? undefined}
               onClick={markCompleted}
             >
               {loading === "complete" ? "Saving..." : "Mark completed"}
@@ -232,7 +251,16 @@ export function HostPanel({
           )}
         </div>
         {completeMessage && (
-          <p className="mt-3 text-sm font-medium text-sage">{completeMessage}</p>
+          <p
+            className={
+              completeIsError
+                ? "mt-3 text-sm font-medium text-terracotta"
+                : "mt-3 text-sm font-medium text-sage"
+            }
+            role={completeIsError ? "alert" : undefined}
+          >
+            {completeMessage}
+          </p>
         )}
       </div>
 

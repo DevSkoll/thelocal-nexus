@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePhoneVerified } from "@/lib/auth";
 import { isListingHost } from "@/lib/host";
+import { listingCompletionBlockReason } from "@/lib/listing-completion";
 import { awardListingCompletionReputation } from "@/lib/reputation";
 
 const completeSchema = z.object({
@@ -31,7 +32,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Cancelled listings cannot be completed" }, { status: 400 });
     }
 
+    // Idempotent COMPLETED: allow re-award path without re-checking schedule.
     if (listing.status !== "COMPLETED") {
+      const blockReason = listingCompletionBlockReason(listing.startsAt, listing.endsAt);
+      if (blockReason) {
+        return NextResponse.json(
+          {
+            error: blockReason,
+            code: "TOO_EARLY",
+            // Rule: after endsAt if set, else after startsAt; unscheduled = anytime.
+          },
+          { status: 400 }
+        );
+      }
+
       await db.listing.update({
         where: { id: listing.id },
         data: { status: "COMPLETED" },
