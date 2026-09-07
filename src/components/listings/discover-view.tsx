@@ -189,6 +189,23 @@ export function DiscoverView({
                         Ask for help →
                       </Link>
                     )}
+                    {intent === "volunteer" && (
+                      <div className="mt-4 space-y-2">
+                        <Link
+                          href="/post?type=VOLUNTEER"
+                          className="inline-block text-sm font-semibold text-terracotta hover:underline"
+                        >
+                          Post a volunteer opportunity →
+                        </Link>
+                        <p className="text-xs text-ink-muted">
+                          Unpaid community work only. Offering a skill or paid help?{" "}
+                          <Link href="/skills/new" className="text-sage hover:underline">
+                            Use Offer a skill
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <>
