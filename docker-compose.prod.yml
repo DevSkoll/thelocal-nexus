@@ -1,12 +1,16 @@
 # Production overlay for demo server (Thor). Usage:
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# DEMO_SEED defaults to false here so container rebuilds do NOT wipe the
+# thelocal-data volume. First boot still seeds when the DB has no users
+# (see docker/entrypoint.sh). Set DEMO_SEED=true only for an intentional reset.
 
 services:
   thelocal:
     ports:
       - "3000:3000"
     environment:
-      DEMO_SEED: "${DEMO_SEED:-true}"
+      DEMO_SEED: "${DEMO_SEED:-false}"
       DEV_GEO_ZIP: "${DEV_GEO_ZIP:-28301}"
       DEV_GEO_LAT: "${DEV_GEO_LAT:-35.0527}"
       DEV_GEO_LNG: "${DEV_GEO_LNG:--78.8784}"
