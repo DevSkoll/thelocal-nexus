@@ -62,6 +62,8 @@ Demo seed data uses fictional personas and reserved test phone numbers only.
 | Doc | Contents |
 |-----|----------|
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to send a change |
+| [CHANGELOG.md](CHANGELOG.md) | What shipped |
+| [TODO.md](TODO.md) | Open work |
 | [docs/PRODUCT.md](docs/PRODUCT.md) | Vision and principles |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Local workflow |

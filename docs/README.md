@@ -28,6 +28,8 @@ Public source: [github.com/DevSkoll/thelocal-nexus](https://github.com/DevSkoll/
 | [MODERATION.md](MODERATION.md) | Report queue, moderator gate, privacy |
 | [REPUTATION.md](REPUTATION.md) | Trust ledger and Verified Host |
 | [ROADMAP.md](ROADMAP.md) | Planned features and known gaps |
+| [CHANGELOG.md](../CHANGELOG.md) | What shipped (Keep a Changelog) |
+| [TODO.md](../TODO.md) | Open work for contributors |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Docker demo server setup |
 
 ## Agent documentation

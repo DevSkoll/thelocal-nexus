@@ -45,6 +45,8 @@ npm run build
 
 Use the PR template. Maintainers squash-merge to `main`.
 
+When the change is user-visible, add a bullet under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md). If you finish an item in [TODO.md](TODO.md), check it off in the same PR.
+
 ## Product lines we will not merge
 
 - Algorithmic / “for you” feeds

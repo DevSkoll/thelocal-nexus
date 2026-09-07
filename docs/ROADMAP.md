@@ -2,6 +2,8 @@
 
 Current state: MVP demo with seeded data, demo auth, and core listing/discovery flows.
 
+Open work for contributors is the checklist in [`TODO.md`](../TODO.md). Shipped history is [`CHANGELOG.md`](../CHANGELOG.md).
+
 ## Shipped (MVP)
 
 - [x] Listing creation with type, nature tag, paid pricing
