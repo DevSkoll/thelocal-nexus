@@ -179,15 +179,53 @@ async function main() {
     },
   });
 
+  // Crew / bot test phones (+15551001xxx) — mock OTP even when Twilio is live
+  const maya = await db.user.create({
+    data: {
+      phone: "+15551001001",
+      phoneVerifiedAt: verifiedAt,
+      email: "maya@example.com",
+      name: "Maya Rivera",
+      slug: "maya-rivera",
+      headline: "Meetup host · neighborhood gatherings",
+      bio: "Hosting low-key meetups so neighbors can meet face-to-face. Coffee, potlucks, and first-timer-friendly hangouts around Fayetteville.",
+      pronouns: "she/her",
+      showRealName: true,
+      showLocation: true,
+      showSkills: true,
+      showHostedListings: true,
+      showReputation: true,
+      showJoinDate: true,
+      verificationTier: "VERIFIED_HOST",
+      reputationScore: 42,
+      reputationUpdatedAt: verifiedAt,
+      zipCode: "28301",
+      latitude: 35.0527,
+      longitude: -78.8784,
+      locationLabel: "Fayetteville, NC",
+      radiusMiles: 15,
+      interests: {
+        create: [
+          { interestId: interestId("food") },
+          { interestId: interestId("outdoors") },
+          { interestId: interestId("music") },
+        ],
+      },
+      alerts: {
+        create: [{ interestId: interestId("food"), radiusMiles: 15 }],
+      },
+    },
+  });
+
   const sam = await db.user.create({
     data: {
-      phone: "+15035550104",
+      phone: "+15551001002",
       phoneVerifiedAt: verifiedAt,
       email: "sam@example.com",
       name: "Sam Okonkwo",
       slug: "sam-okonkwo",
-      headline: "Hawthorne Roastery · open mics & coffee",
-      bio: "Owner of Hawthorne Roastery. Hosting open mics and neighborhood events.",
+      headline: "Skilled labor · handyman & yard help",
+      bio: "Neighbor who fixes fences, hangs shelves, and helps with yard work. Fair rates, tools provided for most small jobs. Also hosts occasional skill shares.",
       pronouns: "he/him",
       showRealName: true,
       showLocation: true,
@@ -198,19 +236,97 @@ async function main() {
       verificationTier: "VERIFIED_HOST",
       reputationScore: 58,
       reputationUpdatedAt: verifiedAt,
-      zipCode: "97214",
-      latitude: 45.512,
-      longitude: -122.632,
-      locationLabel: "Hawthorne, Portland",
+      zipCode: "28303",
+      latitude: 35.061,
+      longitude: -78.89,
+      locationLabel: "Fayetteville, NC",
       radiusMiles: 20,
       interests: {
-        create: [{ interestId: interestId("music") }, { interestId: interestId("food") }],
+        create: [
+          { interestId: interestId("tech") },
+          { interestId: interestId("outdoors") },
+          { interestId: interestId("volunteering") },
+        ],
       },
       profileLinks: {
         create: [
-          { label: "Website", url: "https://example.com/hawthorne-roastery", sortOrder: 0 },
-          { label: "Facebook", url: "https://facebook.com/example", sortOrder: 1 },
-          { label: "X", url: "https://x.com/example", sortOrder: 2 },
+          { label: "Website", url: "https://example.com/sam-handyman", sortOrder: 0 },
+        ],
+      },
+    },
+  });
+
+  const harper = await db.user.create({
+    data: {
+      phone: "+15551001003",
+      phoneVerifiedAt: verifiedAt,
+      email: "harper@example.com",
+      name: "Harper Chen",
+      slug: "harper-chen",
+      headline: "Looking for help · new in town",
+      bio: "Recently moved to the Cape Fear area and looking for neighbors who can help with small projects, moves, and learning the local ropes. Quiet profile preferred.",
+      pronouns: "they/them",
+      showRealName: false,
+      showLocation: true,
+      showSkills: false,
+      showHostedListings: true,
+      showReputation: false,
+      showJoinDate: false,
+      verificationTier: "UNVERIFIED",
+      reputationScore: 8,
+      reputationUpdatedAt: verifiedAt,
+      zipCode: "28304",
+      latitude: 35.04,
+      longitude: -78.92,
+      locationLabel: "Fayetteville, NC",
+      radiusMiles: 12,
+      interests: {
+        create: [
+          { interestId: interestId("volunteering") },
+          { interestId: interestId("food") },
+        ],
+      },
+      alerts: {
+        create: [{ interestId: interestId("volunteering"), radiusMiles: 12 }],
+      },
+    },
+  });
+
+  const avery = await db.user.create({
+    data: {
+      phone: "+15551001004",
+      phoneVerifiedAt: verifiedAt,
+      email: "avery@example.com",
+      name: "Avery Brooks",
+      slug: "avery-brooks",
+      headline: "Outdoor activities · trail days & cleanups",
+      bio: "Organizing recurring outdoor activity days — short hikes, park meetups, and volunteer trail tidy-ups. All fitness levels welcome.",
+      pronouns: "she/her",
+      showRealName: true,
+      showLocation: false,
+      showSkills: true,
+      showHostedListings: true,
+      showReputation: true,
+      showJoinDate: true,
+      verificationTier: "VERIFIED_HOST",
+      reputationScore: 35,
+      reputationUpdatedAt: verifiedAt,
+      zipCode: "28301",
+      latitude: 35.055,
+      longitude: -78.876,
+      locationLabel: "Fayetteville, NC",
+      radiusMiles: 25,
+      interests: {
+        create: [
+          { interestId: interestId("outdoors") },
+          { interestId: interestId("fitness") },
+          { interestId: interestId("volunteering") },
+        ],
+      },
+      alerts: {
+        create: [
+          { interestId: interestId("outdoors"), radiusMiles: 25 },
+          { interestId: interestId("volunteering"), radiusMiles: 25 },
         ],
       },
     },
@@ -465,25 +581,26 @@ async function main() {
       interestSlugs: ["arts"],
     },
     {
-      slug: "roastery-open-mic-night",
-      title: "Open Mic Night at Hawthorne Roastery",
+      slug: "basic-home-repair-workshop",
+      title: "Basic Home Repair Workshop",
       description:
-        "Weekly open mic at a neighborhood coffee shop. Sign up at the door at 7pm. Cover supports local musicians and the venue sound system. All ages until 10pm.",
-      type: "RECURRING_EVENT",
+        "Sam walks neighbors through hanging shelves, fixing a sticky door, and safe ladder use. Bring a small project or just watch. Tools shared — limited to 12 seats.",
+      type: "WORKSHOP",
       posterType: "PERSON",
       posterUserId: sam.id,
-      latitude: 45.512,
-      longitude: -122.632,
-      locationLabel: "Hawthorne Roastery, Portland",
-      locationPrecision: "EXACT",
-      recurrenceRule: "weekly:friday:19:00",
-      capacity: 40,
-      rsvpRequired: false,
-      natureTag: "BUSINESS",
+      latitude: 35.061,
+      longitude: -78.89,
+      locationLabel: "West Fayetteville (address after RSVP)",
+      locationPrecision: "APPROXIMATE",
+      startsAt: daysFromNow(8, 10),
+      endsAt: daysFromNow(8, 13),
+      capacity: 12,
+      rsvpRequired: true,
+      natureTag: "INDIVIDUAL",
       isPaid: true,
-      priceMin: 5,
-      priceMax: 8,
-      interestSlugs: ["music"],
+      priceMin: 15,
+      priceMax: 25,
+      interestSlugs: ["tech"],
     },
     {
       slug: "portland-neighborhood-festival",
@@ -600,6 +717,64 @@ async function main() {
       priceMin: 5,
       priceMax: 5,
       interestSlugs: ["music"],
+    },
+    {
+      slug: "maya-neighbors-coffee-meetup",
+      title: "Neighbors Coffee Meetup",
+      description:
+        "Casual Saturday morning coffee for folks who want to meet nearby neighbors. No agenda — grab a drink, say hi, swap local tips. First-timers especially welcome.",
+      type: "ONE_TIME_EVENT",
+      posterType: "PERSON",
+      posterUserId: maya.id,
+      latitude: 35.0527,
+      longitude: -78.8784,
+      locationLabel: "Downtown Fayetteville",
+      locationPrecision: "EXACT",
+      startsAt: daysFromNow(6, 10),
+      endsAt: daysFromNow(6, 12),
+      capacity: 20,
+      rsvpRequired: true,
+      natureTag: "GATHERING",
+      isPaid: false,
+      interestSlugs: ["food", "outdoors"],
+    },
+    {
+      slug: "harper-looking-for-moving-help",
+      title: "Looking for Help Moving a Couch",
+      description:
+        "Need one or two neighbors to help carry a couch up a short flight of stairs this weekend. Happy to pay for pizza afterward. Strong backs appreciated — about 45 minutes.",
+      type: "LOOKING_FOR",
+      posterType: "PERSON",
+      posterUserId: harper.id,
+      latitude: 35.04,
+      longitude: -78.92,
+      locationLabel: "Southwest Fayetteville",
+      locationPrecision: "NEIGHBORHOOD",
+      startsAt: daysFromNow(2, 14),
+      endsAt: daysFromNow(2, 16),
+      rsvpRequired: true,
+      natureTag: "INDIVIDUAL",
+      isPaid: false,
+      interestSlugs: ["volunteering"],
+    },
+    {
+      slug: "avery-sunday-trail-tidy",
+      title: "Sunday Trail Tidy & Short Walk",
+      description:
+        "Meet at Linear Park for a light litter pickup, then an optional easy 2-mile walk. Gloves provided. Kids welcome with a guardian. Recurring — come when you can.",
+      type: "VOLUNTEER",
+      posterType: "PERSON",
+      posterUserId: avery.id,
+      latitude: 35.055,
+      longitude: -78.876,
+      locationLabel: "Linear Park, Fayetteville",
+      locationPrecision: "EXACT",
+      recurrenceRule: "weekly:sunday:09:00",
+      capacity: 25,
+      rsvpRequired: true,
+      natureTag: "GATHERING",
+      isPaid: false,
+      interestSlugs: ["outdoors", "volunteering", "fitness"],
     },
     {
       slug: "fayetteville-community-festival",
@@ -755,19 +930,19 @@ async function main() {
 
   await db.skillOffer.create({
     data: {
-      slug: "espresso-basics",
+      slug: "handyman-yard-help",
       userId: sam.id,
-      title: "Home espresso basics",
-      description: "Learn dialing-in, milk texture, and tasting notes at the roastery after hours. Great for curious neighbors.",
+      title: "Handyman & yard help",
+      description: "Fence repairs, shelf hanging, mulch spreading, and small outdoor fixes. Fair neighbor rates — tools provided for most jobs under a half day.",
       status: "ACTIVE",
-      latitude: 45.512,
-      longitude: -122.632,
-      locationLabel: "Hawthorne, Portland",
-      radiusMiles: 10,
-      priceMin: null,
-      priceMax: null,
+      latitude: 35.061,
+      longitude: -78.89,
+      locationLabel: "Fayetteville, NC",
+      radiusMiles: 20,
+      priceMin: 25,
+      priceMax: 80,
       interests: {
-        create: [{ interestId: interestId("food") }, { interestId: interestId("music") }],
+        create: [{ interestId: interestId("tech") }, { interestId: interestId("outdoors") }],
       },
     },
   });
@@ -800,7 +975,7 @@ async function main() {
         status: "OPEN",
       },
       {
-        listingId: createdListings["roastery-open-mic-night"],
+        listingId: createdListings["basic-home-repair-workshop"],
         reporterId: todd.id,
         reason: "MISLEADING",
         details: "Cover charge mentioned in comments but listing says optional tip jar.",
@@ -932,8 +1107,8 @@ async function main() {
   });
 
   console.log("Seed complete:");
-  console.log("  4 users with slugs + reputation");
-  console.log("  3 groups, 16 listings (Portland + Fayetteville, multi-city demo)");
+  console.log("  7 users (Joe/Mira/Todd + crew Maya/Sam/Harper/Avery)");
+  console.log("  3 groups, 19 listings (Portland + Fayetteville, multi-city demo)");
   console.log("  Skill offers, reputation events, feedback, RSVPs, messages");
   console.log("  Sample reports + Joe isModerator for /moderation");
   console.log("  Suggestion box samples with votes");

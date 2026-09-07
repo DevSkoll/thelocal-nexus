@@ -17,12 +17,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Enter a valid US phone number" }, { status: 400 });
     }
 
-    const result = await getSmsProvider().sendOtp(phone);
+    const result = await getSmsProvider(phone).sendOtp(phone);
 
     return NextResponse.json({
       ok: true,
       phone,
-      mock: isMockSmsMode(),
+      mock: isMockSmsMode(phone),
       ...(result.devCode ? { devCode: result.devCode } : {}),
     });
   } catch (e) {

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
     }
 
-    const valid = await getSmsProvider().checkOtp(phone, data.code);
+    const valid = await getSmsProvider(phone).checkOtp(phone, data.code);
     if (!valid) {
       return NextResponse.json({ error: "Invalid or expired code" }, { status: 400 });
     }

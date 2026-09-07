@@ -9,6 +9,9 @@ export interface SmsProvider {
 const OTP_TTL_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 
+/** Reserved E.164 range for bot/crew demo logins — never receive real SMS. */
+const TEST_OTP_PHONE_RE = /^\+15551001\d{3}$/;
+
 function hashCode(code: string): string {
   return createHash("sha256").update(code).digest("hex");
 }
@@ -19,6 +22,22 @@ function twilioConfigured(): boolean {
     process.env.TWILIO_AUTH_TOKEN &&
     process.env.TWILIO_VERIFY_SERVICE_SID
   );
+}
+
+/**
+ * Phones that always use the mock OTP path (hashed code in DB, optional devCode
+ * in API). Matches `+15551001xxx` or comma-separated `TEST_OTP_PHONES`.
+ * These numbers never receive SMS, even when Twilio is configured.
+ */
+export function isTestOtpPhone(phone: string): boolean {
+  if (TEST_OTP_PHONE_RE.test(phone)) return true;
+  const extra = process.env.TEST_OTP_PHONES;
+  if (!extra) return false;
+  return extra
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .includes(phone);
 }
 
 class TwilioVerifyProvider implements SmsProvider {
@@ -79,7 +98,9 @@ class MockSmsProvider implements SmsProvider {
     console.log(`[mock-sms] OTP for ${phone}: ${code}`);
 
     const result: { sid: string; devCode?: string } = { sid: `mock-${Date.now()}` };
-    if (process.env.NODE_ENV === "development") {
+    // Always return code for reserved test phones (bots can login in production).
+    // In development, return for all mock sends.
+    if (process.env.NODE_ENV === "development" || isTestOtpPhone(phone)) {
       result.devCode = code;
     }
     return result;
@@ -107,15 +128,28 @@ class MockSmsProvider implements SmsProvider {
   }
 }
 
-let provider: SmsProvider | null = null;
+const mockProvider = new MockSmsProvider();
+let twilioProvider: SmsProvider | null = null;
 
-export function getSmsProvider(): SmsProvider {
-  if (!provider) {
-    provider = twilioConfigured() ? new TwilioVerifyProvider() : new MockSmsProvider();
+function getTwilioProvider(): SmsProvider {
+  if (!twilioProvider) {
+    twilioProvider = new TwilioVerifyProvider();
   }
-  return provider;
+  return twilioProvider;
 }
 
-export function isMockSmsMode(): boolean {
+/** Provider for a specific phone — test OTP phones always use mock. */
+export function getSmsProvider(phone?: string): SmsProvider {
+  if (phone && isTestOtpPhone(phone)) {
+    return mockProvider;
+  }
+  if (twilioConfigured()) {
+    return getTwilioProvider();
+  }
+  return mockProvider;
+}
+
+export function isMockSmsMode(phone?: string): boolean {
+  if (phone && isTestOtpPhone(phone)) return true;
   return !twilioConfigured();
 }

@@ -117,11 +117,13 @@ export function LoginForm() {
         <p className="text-sm text-ink-muted">
           Enter the 6-digit code sent to your phone.
         </p>
-        {mockMode && devCode && (
+        {devCode && (
           <div className="rounded-xl bg-sage/5 border border-sage/20 px-4 py-3 text-sm">
-            <p className="font-medium text-sage">Demo mode</p>
+            <p className="font-medium text-sage">
+              {mockMode ? "Demo / test OTP" : "Test phone OTP"}
+            </p>
             <p className="text-ink-muted mt-1">
-              No Twilio configured. Your code:{" "}
+              No SMS sent for this number. Your code:{" "}
               <span className="font-mono font-semibold text-ink">{devCode}</span>
             </p>
           </div>
@@ -177,7 +179,7 @@ export function LoginForm() {
         {loading ? "Sending..." : "Send verification code"}
       </Button>
       <p className="text-xs text-ink-muted text-center">
-        Demo: Joe +15035550101 · Mira +15035550102 · Todd +15035550103 · Sam +15035550104
+        Crew test OTP: Maya +15551001001 · Sam +15551001002 · Harper +15551001003 · Avery +15551001004
       </p>
     </form>
   );

@@ -54,11 +54,22 @@ Access is granted when:
 
 APIs never return phone numbers in the queue — display name + slug only. See [API.md](API.md) Reports section.
 
-## Demo login
+## Demo / crew login (mock OTP)
 
-Visit `/login`, enter a demo phone (e.g. `+15035550101` for Joe), and use the OTP shown in the UI (mock SMS — no Twilio needed). See [DEMO-PERSONAS.md](DEMO-PERSONAS.md).
+Visit `/login` and use a **crew test phone** — mock OTP always, even when Twilio is configured:
 
-Configure Twilio for production SMS via `.env.example` variables.
+| Persona | Phone |
+|---------|-------|
+| Maya Rivera | +15551001001 |
+| Sam Okonkwo | +15551001002 |
+| Harper Chen | +15551001003 |
+| Avery Brooks | +15551001004 |
+
+Pattern: `+15551001xxx` (or env `TEST_OTP_PHONES`). These numbers **never receive SMS**; the send API returns `devCode` for bots. See [DEMO-PERSONAS.md](DEMO-PERSONAS.md).
+
+Legacy Portland seed phones (`+1503555010x`) only get mock OTP when Twilio env vars are unset.
+
+Configure Twilio for real SMS via `.env` / compose (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_VERIFY_SERVICE_SID`). Do not commit secrets.
 
 ## Code conventions
 

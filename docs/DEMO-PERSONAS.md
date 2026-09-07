@@ -4,20 +4,71 @@ Seeded by `prisma/seed.ts`. Reset with `npm run db:seed`.
 
 Sign in at `/login` with phone OTP — no password required.
 
-**Demo mode:** Twilio is not configured locally. After entering a demo phone, the OTP appears in the UI and server console.
+**Mock OTP:** Crew phones (`+15551001xxx`) always get mock OTP + `devCode` (even with Twilio). Legacy Portland phones only when Twilio is unset.
 
 ## Demo phone numbers
 
+**Crew test OTP phones** (`+15551001xxx`) always use mock OTP — even when Twilio is configured on the live demo. These numbers **never receive SMS**. The API returns `devCode` so bots and humans can complete login. Optional override list: env `TEST_OTP_PHONES` (comma-separated E.164).
+
 | Persona | Phone | OTP |
 |---------|-------|-----|
-| Joe | +15035550101 | Shown in dev UI after send |
-| Mira | +15035550102 | Shown in dev UI after send |
-| Todd | +15035550103 | Shown in dev UI after send |
-| Sam | +15035550104 | Shown in dev UI after send |
+| Maya Rivera | +15551001001 | `devCode` in API / login UI |
+| Sam Okonkwo | +15551001002 | `devCode` in API / login UI |
+| Harper Chen | +15551001003 | `devCode` in API / login UI |
+| Avery Brooks | +15551001004 | `devCode` in API / login UI |
+
+**Legacy Portland seed phones** (mock only when Twilio is unset):
+
+| Persona | Phone | OTP |
+|---------|-------|-----|
+| Joe | +15035550101 | Shown when global mock SMS |
+| Mira | +15035550102 | Shown when global mock SMS |
+| Todd | +15035550103 | Shown when global mock SMS |
 
 ## Users
 
-### Joe Martinez — +15035550101
+### Maya Rivera — +15551001001
+
+- **Role:** Meetup host
+- **Slug:** `maya-rivera`
+- **Tier:** VERIFIED_HOST
+- **Location:** Fayetteville, NC
+- **Privacy:** open profile (name, location, skills, reputation, join date)
+- **Listing:** Neighbors Coffee Meetup (`maya-neighbors-coffee-meetup`) — ONE_TIME_EVENT / GATHERING
+- **Test as:** Host dashboard, crew mock OTP login
+
+### Sam Okonkwo — +15551001002
+
+- **Role:** Skilled labor (handyman / yard)
+- **Slug:** `sam-okonkwo`
+- **Tier:** VERIFIED_HOST
+- **Location:** Fayetteville, NC
+- **Interests:** Tech, Outdoors, Volunteering
+- **Skill offer:** Handyman & yard help
+- **Listings:** Basic Home Repair Workshop; Hay Street open mic
+- **Test as:** Skill offer, paid workshop, crew mock OTP
+
+### Harper Chen — +15551001003
+
+- **Role:** Looking for help / new in town
+- **Slug:** `harper-chen`
+- **Tier:** Phone verified, UNVERIFIED host tier
+- **Location:** Fayetteville, NC
+- **Privacy:** `showRealName: false`, `showSkills: false`, `showReputation: false`, `showJoinDate: false`
+- **Listing:** Looking for Help Moving a Couch (`harper-looking-for-moving-help`) — LOOKING_FOR
+- **Test as:** Help-seeker flow, quieter public profile
+
+### Avery Brooks — +15551001004
+
+- **Role:** Outdoor activities / volunteer trail days
+- **Slug:** `avery-brooks`
+- **Tier:** VERIFIED_HOST
+- **Location:** Fayetteville, NC (location hidden on public profile)
+- **Privacy:** `showLocation: false`
+- **Listing:** Sunday Trail Tidy & Short Walk (`avery-sunday-trail-tidy`) — VOLUNTEER / recurring
+- **Test as:** Recurring volunteer activity host
+
+### Joe Martinez — +15035550101 (legacy seed)
 
 - **Role:** Bike club admin, verified host
 - **Tier:** VERIFIED_HOST
@@ -45,14 +96,6 @@ Sign in at `/login` with phone OTP — no password required.
 - **Interests:** Volunteering, Outdoors
 - **Test as:** Pending barn RSVP (needs Mira approval), pending D&D RSVP, hiking buddy listing
 
-### Sam Okonkwo — +15035550104
-
-- **Role:** Hawthorne Roastery owner, business host
-- **Tier:** VERIFIED_HOST
-- **Location:** Hawthorne, Portland (10 mi radius)
-- **Interests:** Music, Food
-- **Test as:** Paid business listing (open mic), interested RSVP on bike ride
-
 ## Groups
 
 | Slug | Name | Admin | Type |
@@ -60,7 +103,7 @@ Sign in at `/login` with phone OTP — no password required.
 | `portland-urban-cyclists` | Portland Urban Cyclists | Joe | COMMUNITY |
 | `riverfront-community-network` | Riverfront Community Network | Todd | ORGANIZATION |
 
-## Listings (11)
+## Listings (selected)
 
 | Slug | Title | Nature | Paid | Notable |
 |------|-------|--------|------|---------|
@@ -72,7 +115,10 @@ Sign in at `/login` with phone OTP — no password required.
 | `join-portland-urban-cyclists` | Portland Urban Cyclists — Recruiting | Organization | No | GROUP_SEEKING type |
 | `looking-for-hiking-buddy` | Looking for Hiking Buddy | Individual | No | LOOKING_FOR type |
 | `watercolor-workshop-beginners` | Watercolor Workshop | Individual | **$10–$20** | Paid, home-hosted |
-| `roastery-open-mic-night` | Open Mic at Hawthorne Roastery | Business | **$5–$8** | Sam's paid business event |
+| `basic-home-repair-workshop` | Basic Home Repair Workshop | Individual | **$15–$25** | Sam workshop |
+| `maya-neighbors-coffee-meetup` | Neighbors Coffee Meetup | Gathering | No | Maya crew |
+| `harper-looking-for-moving-help` | Looking for Help Moving a Couch | Individual | No | Harper LOOKING_FOR |
+| `avery-sunday-trail-tidy` | Sunday Trail Tidy & Short Walk | Gathering | No | Avery volunteer |
 | `portland-neighborhood-festival` | Southeast Portland Festival | Large event | No | LARGE_EVENT nature tag |
 | `makers-meetup-portland` | Portland Makers Monthly Meetup | Gathering | No | Tech interest |
 
@@ -97,7 +143,7 @@ Sign in at `/login` with phone OTP — no password required.
 ## Suggested test flows
 
 1. **RSVP approval:** Login as Mira → `/host` → approve Todd's barn RSVP
-2. **Paid listing:** View `/listings/roastery-open-mic-night` — PAID EVENT badge visible
+2. **Paid listing:** View `/listings/basic-home-repair-workshop` — PAID EVENT badge visible
 3. **Group join:** Login as Sam → `/groups/portland-urban-cyclists` → join
 4. **Messages:** View barn listing → see listing-scoped thread
 5. **Create listing:** Login as Joe → `/post` → set nature tag + interests
