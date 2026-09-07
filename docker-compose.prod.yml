@@ -2,8 +2,9 @@
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 #
 # DEMO_SEED defaults to false here so container rebuilds do NOT wipe the
-# thelocal-data volume. First boot still seeds when the DB has no users
-# (see docker/entrypoint.sh). Set DEMO_SEED=true only for an intentional reset.
+# thelocal-data volume and first boot does NOT auto-seed (empty DB stays empty
+# until real users; see docker/entrypoint.sh). Set DEMO_SEED=true only for an
+# intentional demo reset.
 
 services:
   thelocal:

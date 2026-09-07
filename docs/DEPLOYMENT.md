@@ -20,12 +20,10 @@ Open `http://<server-ip>:3000`
 ## What happens on start
 
 1. **Migrations** — `prisma migrate deploy` applies schema
-2. **Seed** — runs only when:
-   - `DEMO_SEED=true` (explicit wipe + reseed — destructive), **or**
-   - the database has **no users** yet (first boot / empty volume)
+2. **Seed** — runs **only** when `DEMO_SEED=true` (explicit wipe + reseed — destructive). First boot with an empty DB and `DEMO_SEED=false` migrates only and starts with **zero users** (organic content / production path).
 3. **App** — Next.js standalone server on port 3000
 
-On production/demo hosts (Thor + `docker-compose.prod.yml`), `DEMO_SEED` defaults to **`false`**. After first boot, crew-created listings and users persist across container rebuilds. Never run `docker compose down -v` on Thor unless you intentionally want to wipe `thelocal-data`.
+On production/demo hosts (Thor + `docker-compose.prod.yml`), `DEMO_SEED` defaults to **`false`**. Empty databases stay empty until real users sign up. Never run `docker compose down -v` on Thor unless you intentionally want to wipe `thelocal-data`.
 
 ## Environment variables
 
@@ -33,13 +31,13 @@ On production/demo hosts (Thor + `docker-compose.prod.yml`), `DEMO_SEED` default
 |----------|----------------|------------------------|-------------|
 | `APP_PORT` | `3000` | `3000` | Host port mapping |
 | `DATABASE_URL` | `file:/data/dev.db` | same | SQLite path inside container |
-| `DEMO_SEED` | `true` | **`false`** | Force wipe+reseed on start when `true`. When `false`, seed only if DB has no users |
+| `DEMO_SEED` | `true` | **`false`** | Seed **only** when `true` (destructive wipe+reseed). When `false`, never auto-seed — empty DB stays empty |
 | `DEV_GEO_*` | Fayetteville, NC | same | Fallback location when IP is private |
 | `TWILIO_*` | (empty) | same | Mock SMS login when unset |
 | `ALTCHA_HMAC_KEY` | (required in prod) | **required** | HMAC secret for self-hosted ALTCHA PoW on phone OTP send. Generate a long random string (e.g. `openssl rand -hex 32`). |
 | `ALTCHA_BYPASS_TEST_PHONES` | unset / `false` | unset | Optional. When `true`, skip ALTCHA for crew/test OTP phones (`+15551001xxx` / `TEST_OTP_PHONES`). Default off — prefer PoW (widget auto-solves). |
 
-**Production / demo host (Thor):** keep `DEMO_SEED=false` after first boot (prod overlay default). Set `DEMO_SEED=true` only for an intentional full demo reset. Prefer a one-shot `docker compose run` / manual seed over leaving it `true` in `.env`.
+**Production / demo host (Thor):** keep `DEMO_SEED=false` (prod overlay default). First boot does **not** seed — production stays empty until real users. Set `DEMO_SEED=true` only for an intentional full demo reset. Prefer a one-shot `docker compose run` / manual seed over leaving it `true` in `.env`.
 
 ## ALTCHA (phone OTP send)
 
@@ -71,7 +69,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 docker compose logs -f          # Follow logs
 docker compose down             # Stop (keeps thelocal-data volume)
 docker compose down -v          # Stop and WIPE database volume — avoid on Thor
-docker compose restart          # Restart (does not re-seed unless DEMO_SEED=true or DB empty)
+docker compose restart          # Restart (does not re-seed unless DEMO_SEED=true)
 ```
 
 ## Profile uploads
