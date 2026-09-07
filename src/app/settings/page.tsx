@@ -7,6 +7,7 @@ import { SettingsForm } from "@/components/settings/settings-form";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { ProfileEditForm } from "@/components/profiles/profile-edit-form";
 import { getCurrentUser } from "@/lib/auth";
+import { getAreaPreference } from "@/lib/location";
 import { formatVerificationBadges } from "@/lib/format";
 import { maskPhone } from "@/lib/phone";
 import { db } from "@/lib/db";
@@ -17,7 +18,7 @@ export default async function SettingsPage() {
 
   const badges = formatVerificationBadges(user);
 
-  const [alerts, groups, profileLinks] = await Promise.all([
+  const [alerts, groups, profileLinks, area] = await Promise.all([
     db.alert.findMany({
       where: { userId: user.id },
       include: { interest: true },
@@ -30,6 +31,7 @@ export default async function SettingsPage() {
       where: { userId: user.id },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     }),
+    getAreaPreference(),
   ]);
 
   return (
@@ -68,11 +70,19 @@ export default async function SettingsPage() {
       </section>
 
       
-      <section id="edit-profile" className="mt-6 rounded-[1.75rem] border border-stone/60 bg-white p-6 scroll-mt-24">
-        <h2 className="font-serif text-lg font-semibold mb-1">Edit public profile</h2>
-        <p className="text-sm text-ink-muted mb-5">
-          Customize how neighbors see you. Phone number stays private — always.
-        </p>
+      <section id="edit-profile" className="mt-6 rounded-[1.75rem] border border-stone/60 bg-white p-6 sm:p-7 scroll-mt-24 shadow-sm">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-sage">Public profile</p>
+            <h2 className="font-serif text-lg font-semibold mb-1">Edit how neighbors see you</h2>
+            <p className="text-sm text-ink-muted">
+              Name, bio, photos, links, and privacy. Phone stays private — always.
+            </p>
+          </div>
+          <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">
+            Save with “Save profile”
+          </span>
+        </div>
         <ProfileEditForm
           name={user.name}
           slug={user.slug}
@@ -90,14 +100,25 @@ export default async function SettingsPage() {
           links={profileLinks.map((l) => ({ label: l.label, url: l.url }))}
         />
       </section>
-      <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <MapPin className="h-5 w-5 text-terracotta" />
-          <h2 className="font-serif text-lg font-semibold">Your area &amp; interests</h2>
+      <section id="area-settings" className="mt-6 rounded-[1.75rem] border border-stone/60 bg-white p-6 sm:p-7 shadow-sm scroll-mt-24">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+          <div className="flex items-start gap-2">
+            <MapPin className="h-5 w-5 text-terracotta mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-terracotta">Discovery settings</p>
+              <h2 className="font-serif text-lg font-semibold">Your area &amp; interests</h2>
+              <p className="text-sm text-ink-muted mt-0.5">
+                Zip, radius, and tags used for nearby discovery — separate from your public profile.
+              </p>
+            </div>
+          </div>
+          <span className="rounded-full bg-terracotta/10 px-3 py-1 text-xs font-semibold text-terracotta">
+            Save with “Save area &amp; interests”
+          </span>
         </div>
         <SettingsForm
-          zipCode={user.zipCode}
-          locationLabel={user.locationLabel}
+          zipCode={user.zipCode ?? (user.latitude == null ? area.zipCode : null)}
+          locationLabel={user.locationLabel ?? (user.latitude == null ? area.locationLabel : null)}
           radiusMiles={user.radiusMiles}
           interestSlugs={user.interests.map((i) => i.interest.slug)}
           alertSlugs={alerts.map((a) => a.interest.slug)}

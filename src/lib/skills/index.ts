@@ -98,6 +98,14 @@ export async function getSkillOfferBySlug(slug: string) {
   });
 }
 
+
+function normalizePrice(value: number | null | undefined): number | null {
+  if (value == null) return null;
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n) || n < 0) throw new Error("Price must be a non-negative number");
+  return n;
+}
+
 export type CreateSkillOfferInput = {
   title: string;
   description: string;
@@ -120,6 +128,12 @@ export async function createSkillOffer(userId: string, input: CreateSkillOfferIn
   const existing = await db.skillOffer.findUnique({ where: { slug } });
   if (existing) slug = `${slug}-${Date.now().toString(36)}`;
 
+  const priceMin = normalizePrice(input.priceMin);
+  const priceMax = normalizePrice(input.priceMax);
+  if (priceMin != null && priceMax != null && priceMax < priceMin) {
+    throw new Error("Maximum price must be at least the minimum");
+  }
+
   return db.skillOffer.create({
     data: {
       slug,
@@ -130,8 +144,8 @@ export async function createSkillOffer(userId: string, input: CreateSkillOfferIn
       longitude: input.longitude ?? null,
       locationLabel: input.locationLabel ?? null,
       radiusMiles: input.radiusMiles ?? null,
-      priceMin: input.priceMin ?? null,
-      priceMax: input.priceMax ?? null,
+      priceMin,
+      priceMax,
       interests: { create: interests.map((i) => ({ interestId: i.id })) },
     },
     include: skillInclude,
@@ -182,8 +196,8 @@ export async function updateSkillOffer(
       ...(input.longitude !== undefined ? { longitude: input.longitude } : {}),
       ...(input.locationLabel !== undefined ? { locationLabel: input.locationLabel } : {}),
       ...(input.radiusMiles !== undefined ? { radiusMiles: input.radiusMiles } : {}),
-      ...(input.priceMin !== undefined ? { priceMin: input.priceMin } : {}),
-      ...(input.priceMax !== undefined ? { priceMax: input.priceMax } : {}),
+      ...(input.priceMin !== undefined ? { priceMin: normalizePrice(input.priceMin) } : {}),
+      ...(input.priceMax !== undefined ? { priceMax: normalizePrice(input.priceMax) } : {}),
     },
     include: skillInclude,
   });

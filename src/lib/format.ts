@@ -10,13 +10,29 @@ export function formatNatureTag(tag: ListingNatureTag): string {
   return LISTING_NATURE_TAGS.find((t) => t.value === tag)?.label ?? tag;
 }
 
-export function formatPriceRange(min: number | null, max: number | null): string | null {
-  if (min == null) return null;
-  const fmt = (n: number) =>
-    n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
-  const effectiveMax = max ?? min;
-  if (effectiveMax === min) return fmt(min);
-  return `${fmt(min)}–${fmt(effectiveMax)}`;
+export function formatPriceRange(
+  min: number | null | undefined,
+  max: number | null | undefined
+): string | null {
+  const toNum = (v: number | null | undefined): number | null => {
+    if (v == null) return null;
+    const n = typeof v === "number" ? v : Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  const lo = toNum(min);
+  const hi = toNum(max);
+  if (lo == null && hi == null) return null;
+  // Both zero (or one zero + missing) → free / negotiable
+  if ((lo == null || lo === 0) && (hi == null || hi === 0)) return null;
+
+  const fmt = (n: number) => (n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`);
+  if (lo != null && hi != null) {
+    if (hi === lo) return fmt(lo);
+    if (lo === 0) return `Up to ${fmt(hi)}`;
+    return `${fmt(lo)}–${fmt(hi)}`;
+  }
+  if (lo != null) return `From ${fmt(lo)}`;
+  return `Up to ${fmt(hi!)}`;
 }
 
 export function formatListingDate(

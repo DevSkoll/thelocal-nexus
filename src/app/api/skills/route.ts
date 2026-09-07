@@ -3,15 +3,21 @@ import { z } from "zod";
 import { requirePhoneVerified } from "@/lib/auth";
 import { createSkillOffer, listSkillOffers } from "@/lib/skills";
 
+
+const optionalPrice = z.preprocess((val) => {
+  if (val === "" || val === undefined) return null;
+  return val;
+}, z.coerce.number().min(0).nullable()).optional();
+
 const createSchema = z.object({
   title: z.string().min(3).max(120),
   description: z.string().min(10).max(5000),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
+  latitude: z.coerce.number().optional().nullable(),
+  longitude: z.coerce.number().optional().nullable(),
   locationLabel: z.string().max(120).optional().nullable(),
-  radiusMiles: z.number().int().min(1).max(100).optional().nullable(),
-  priceMin: z.number().min(0).optional().nullable(),
-  priceMax: z.number().min(0).optional().nullable(),
+  radiusMiles: z.coerce.number().int().min(1).max(100).optional().nullable(),
+  priceMin: optionalPrice,
+  priceMax: optionalPrice,
   interestSlugs: z.array(z.string()).min(1),
 });
 

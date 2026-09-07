@@ -35,8 +35,14 @@ export async function POST(req: NextRequest) {
 
     const cookieStore = await cookies();
     const areaFromCookie = parseAreaCookie(cookieStore.get(AREA_COOKIE)?.value);
+    const userNeedsLocation =
+      !existing ||
+      (existing.latitude == null &&
+        existing.longitude == null &&
+        !existing.zipCode &&
+        !existing.locationLabel);
     const locationData =
-      isNew && areaFromCookie
+      userNeedsLocation && areaFromCookie
         ? {
             zipCode: areaFromCookie.zipCode,
             locationLabel: areaFromCookie.locationLabel,
@@ -52,6 +58,7 @@ export async function POST(req: NextRequest) {
           data: {
             phoneVerifiedAt: now,
             ...(data.name?.trim() ? { name: data.name.trim() } : {}),
+            ...locationData,
           },
         })
       : await db.user.create({

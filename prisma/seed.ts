@@ -18,6 +18,10 @@ const INTERESTS = [
   { slug: "fitness", name: "Fitness", icon: "💪" },
   { slug: "books", name: "Books & Discussion", icon: "📚" },
   { slug: "tech", name: "Tech & Makers", icon: "🔧" },
+  { slug: "home-repairs", name: "Home & Repairs", icon: "🛠️" },
+  { slug: "yard-garden", name: "Yard & Garden", icon: "🌿" },
+  { slug: "parenting", name: "Parenting", icon: "👶" },
+  { slug: "pets", name: "Pets", icon: "🐕" },
   { slug: "religion", name: "Religion", icon: "🙏" },
 ];
 
@@ -243,8 +247,8 @@ async function main() {
       radiusMiles: 20,
       interests: {
         create: [
-          { interestId: interestId("tech") },
-          { interestId: interestId("outdoors") },
+          { interestId: interestId("home-repairs") },
+          { interestId: interestId("yard-garden") },
           { interestId: interestId("volunteering") },
         ],
       },
@@ -942,7 +946,10 @@ async function main() {
       priceMin: 25,
       priceMax: 80,
       interests: {
-        create: [{ interestId: interestId("tech") }, { interestId: interestId("outdoors") }],
+        create: [
+          { interestId: interestId("home-repairs") },
+          { interestId: interestId("yard-garden") },
+        ],
       },
     },
   });

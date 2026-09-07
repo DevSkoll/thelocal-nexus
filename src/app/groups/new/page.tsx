@@ -45,9 +45,9 @@ export default async function NewGroupPage() {
   }
 
   const defaultLocation = {
-    lat: user.latitude ?? area.latitude,
-    lng: user.longitude ?? area.longitude,
-    label: user.locationLabel ?? area.locationLabel,
+    lat: area.latitude,
+    lng: area.longitude,
+    label: area.locationLabel,
   };
 
   return (

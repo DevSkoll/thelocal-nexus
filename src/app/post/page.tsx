@@ -35,17 +35,11 @@ export default async function PostPage({ searchParams }: PostPageProps) {
     include: { group: true },
   });
 
-  const defaultLocation = user.latitude != null && user.longitude != null
-    ? {
-        lat: user.latitude,
-        lng: user.longitude,
-        label: user.locationLabel ?? area.locationLabel,
-      }
-    : {
-        lat: area.latitude,
-        lng: area.longitude,
-        label: area.locationLabel,
-      };
+  const defaultLocation = {
+    lat: area.latitude,
+    lng: area.longitude,
+    label: area.locationLabel,
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">

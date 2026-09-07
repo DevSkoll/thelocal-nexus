@@ -47,7 +47,7 @@ export function SettingsForm({
         const data = await res.json();
         throw new Error(data.error ?? "Failed to save");
       }
-      setMessage("Settings saved.");
+      setMessage("Area & interests saved.");
       router.refresh();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Something went wrong. Try again.");
@@ -92,7 +92,7 @@ export function SettingsForm({
           className="mt-1 max-w-[10rem]"
           value={zip}
           onChange={(e) => setZip(e.target.value.replace(/\D/g, "").slice(0, 5))}
-          placeholder="28301"
+          placeholder="60187"
           inputMode="numeric"
           maxLength={5}
         />
@@ -163,15 +163,25 @@ export function SettingsForm({
         </div>
       </div>
 
+      <div className="sticky bottom-3 z-10 -mx-1 rounded-[1.5rem] border border-terracotta/20 bg-cream/95 backdrop-blur-sm px-4 py-3 shadow-lg flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink">Save area &amp; interests</p>
+          <p className="text-xs text-ink-muted truncate">Does not change your public profile bio or photos.</p>
+        </div>
+        <Button
+          onClick={saveSettings}
+          disabled={saving || zip.length < 5}
+          className="rounded-2xl px-5 shrink-0"
+        >
+          {saving ? "Saving..." : "Save area & interests"}
+        </Button>
+      </div>
+
       {message && (
-        <p className={cn("text-sm font-medium", message.includes("saved") ? "text-sage" : "text-terracotta")}>
+        <p className={cn("text-sm font-medium", message.toLowerCase().includes("saved") ? "text-sage" : "text-terracotta")}>
           {message}
         </p>
       )}
-
-      <Button onClick={saveSettings} disabled={saving || zip.length < 5}>
-        {saving ? "Saving..." : "Save settings"}
-      </Button>
     </div>
   );
 }

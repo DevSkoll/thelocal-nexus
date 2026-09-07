@@ -25,6 +25,8 @@ export const LISTING_CATEGORIES = [
   { slug: "fitness", name: "Fitness", icon: "💪" },
   { slug: "books", name: "Books & Discussion", icon: "📚" },
   { slug: "tech", name: "Tech & Makers", icon: "🔧" },
+  { slug: "home-repairs", name: "Home & Repairs", icon: "🛠️" },
+  { slug: "yard-garden", name: "Yard & Garden", icon: "🌿" },
   { slug: "parenting", name: "Parenting", icon: "👶" },
   { slug: "pets", name: "Pets", icon: "🐕" },
   { slug: "religion", name: "Religion", icon: "🙏" },

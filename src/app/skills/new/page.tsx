@@ -44,11 +44,12 @@ export default async function NewSkillPage() {
     );
   }
 
+  // Prefer active area (cookie-first) so new offers match browsing location
   const defaultLocation = {
-    lat: user.latitude ?? area.latitude,
-    lng: user.longitude ?? area.longitude,
-    label: user.locationLabel ?? area.locationLabel,
-    radiusMiles: user.radiusMiles ?? area.radiusMiles,
+    lat: area.latitude,
+    lng: area.longitude,
+    label: area.locationLabel,
+    radiusMiles: area.radiusMiles,
   };
 
   return (

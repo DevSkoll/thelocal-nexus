@@ -440,13 +440,19 @@ export function ProfileEditForm({
           {message}
         </p>
       )}
-      <Button
-        onClick={save}
-        disabled={saving || form.name.length < 1 || form.slug.length < 2}
-        className="rounded-2xl w-full sm:w-auto"
-      >
-        {saving ? "Saving..." : "Save profile"}
-      </Button>
+      <div className="sticky bottom-3 z-10 -mx-1 rounded-[1.5rem] border border-sage/25 bg-cream/95 backdrop-blur-sm px-4 py-3 shadow-lg flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink">Save public profile</p>
+          <p className="text-xs text-ink-muted truncate">Bio, photos, links &amp; privacy — not your zip or alerts.</p>
+        </div>
+        <Button
+          onClick={save}
+          disabled={saving || form.name.length < 1 || form.slug.length < 2}
+          className="rounded-2xl px-5 shrink-0"
+        >
+          {saving ? "Saving..." : "Save profile"}
+        </Button>
+      </div>
     </div>
   );
 }
