@@ -6,6 +6,7 @@ import { isModerator } from "@/lib/moderation";
 import { getAreaPreference } from "@/lib/location";
 import { LocationMenu } from "./location-menu";
 import { Button } from "@/components/ui/button";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 export async function Header() {
   const [user, area] = await Promise.all([getCurrentUser(), getAreaPreference()]);
@@ -104,6 +105,7 @@ export async function Header() {
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">{user ? user.name.split(" ")[0] : "Sign in"}</span>
             </Link>
+            {user && <LogoutButton compact />}
           </nav>
         </div>
       </div>
