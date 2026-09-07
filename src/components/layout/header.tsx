@@ -88,6 +88,15 @@ export async function Header() {
                 <span className="hidden sm:inline">Post</span>
               </Button>
             </Link>
+            {user && (
+              <Link
+                href="/settings#edit-profile"
+                className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                title="Edit profile"
+              >
+                Edit profile
+              </Link>
+            )}
             <Link
               href={user ? (user.slug ? `/u/${user.slug}` : "/settings") : "/login"}
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"

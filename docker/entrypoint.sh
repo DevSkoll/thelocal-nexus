@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-mkdir -p /data
+mkdir -p /data /data/uploads/avatars /data/uploads/covers
 export DATABASE_URL="${DATABASE_URL:-file:/data/dev.db}"
 export HOSTNAME="${HOSTNAME:-0.0.0.0}"
 export PORT="${PORT:-3000}"

@@ -38,6 +38,7 @@ Current state: MVP demo with seeded data, demo auth, and core listing/discovery 
 - [x] Skills advertising (SkillOffer discovery + owner APIs)
 - [x] Skill create UI form
 - [x] Peer vouch flow on public profiles
+- [x] Profile privacy + customization (links, cover/avatar, toggles)
 - [x] EVENT_HOSTED / EVENT_COMPLETED on listing completion
 - [ ] Image uploads for listings and groups
 - [ ] Geocoding integration for location input

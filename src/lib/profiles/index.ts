@@ -3,13 +3,21 @@ import { slugify } from "@/lib/utils";
 import { getPublicTrustSummary } from "@/lib/reputation";
 import { applyEvent } from "@/lib/reputation";
 
-const PUBLIC_USER_SELECT = {
+const OWN_PROFILE_SELECT = {
   id: true,
   slug: true,
   name: true,
   headline: true,
   bio: true,
   avatarUrl: true,
+  coverImageUrl: true,
+  pronouns: true,
+  showRealName: true,
+  showLocation: true,
+  showSkills: true,
+  showHostedListings: true,
+  showReputation: true,
+  showJoinDate: true,
   locationLabel: true,
   verificationTier: true,
   reputationScore: true,
@@ -29,12 +37,28 @@ export async function ensureUniqueUserSlug(base: string, excludeUserId?: string)
   }
 }
 
+function isHttpUrl(value: string): boolean {
+  try {
+    const u = new URL(value);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+export type ProfileLinkInput = {
+  label: string;
+  url: string;
+  sortOrder?: number;
+};
+
 export async function getPublicProfileBySlug(slug: string) {
   const user = await db.user.findUnique({
     where: { slug },
     select: {
-      ...PUBLIC_USER_SELECT,
+      ...OWN_PROFILE_SELECT,
       interests: { include: { interest: true } },
+      profileLinks: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
       skillOffers: {
         where: { status: "ACTIVE" },
         include: { interests: { include: { interest: true } } },
@@ -54,25 +78,43 @@ export async function getPublicProfileBySlug(slug: string) {
 
   if (!user) return null;
 
-  const trust = await getPublicTrustSummary(user.id);
+  const displayName = user.showRealName ? user.name : user.slug;
+  const trust = user.showReputation ? await getPublicTrustSummary(user.id) : null;
 
   // Never expose phone/email on public profiles
   return {
     id: user.id,
     slug: user.slug,
-    name: user.name,
+    name: displayName,
+    realNameHidden: !user.showRealName,
     headline: user.headline,
     bio: user.bio,
     avatarUrl: user.avatarUrl,
-    locationLabel: user.locationLabel,
+    coverImageUrl: user.coverImageUrl,
+    pronouns: user.pronouns,
+    locationLabel: user.showLocation ? user.locationLabel : null,
     verificationTier: user.verificationTier,
-    reputationScore: user.reputationScore,
+    reputationScore: user.showReputation ? user.reputationScore : null,
     phoneVerified: user.phoneVerifiedAt != null,
-    memberSince: user.createdAt,
+    memberSince: user.showJoinDate ? user.createdAt : null,
+    links: user.profileLinks.map((l) => ({
+      id: l.id,
+      label: l.label,
+      url: l.url,
+      sortOrder: l.sortOrder,
+    })),
     interests: user.interests.map((i) => i.interest),
-    skillOffers: user.skillOffers,
-    hostedListings: user.listings,
+    skillOffers: user.showSkills ? user.skillOffers : [],
+    hostedListings: user.showHostedListings ? user.listings : [],
     trust,
+    privacy: {
+      showRealName: user.showRealName,
+      showLocation: user.showLocation,
+      showSkills: user.showSkills,
+      showHostedListings: user.showHostedListings,
+      showReputation: user.showReputation,
+      showJoinDate: user.showJoinDate,
+    },
   };
 }
 
@@ -81,7 +123,25 @@ export type UpdateOwnProfileInput = {
   slug?: string;
   headline?: string | null;
   bio?: string | null;
+  pronouns?: string | null;
+  showRealName?: boolean;
+  showLocation?: boolean;
+  showSkills?: boolean;
+  showHostedListings?: boolean;
+  showReputation?: boolean;
+  showJoinDate?: boolean;
+  links?: ProfileLinkInput[];
 };
+
+export async function getOwnProfile(userId: string) {
+  return db.user.findUnique({
+    where: { id: userId },
+    select: {
+      ...OWN_PROFILE_SELECT,
+      profileLinks: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+    },
+  });
+}
 
 export async function updateOwnProfile(userId: string, input: UpdateOwnProfileInput) {
   const data: {
@@ -89,22 +149,73 @@ export async function updateOwnProfile(userId: string, input: UpdateOwnProfileIn
     slug?: string;
     headline?: string | null;
     bio?: string | null;
+    pronouns?: string | null;
+    showRealName?: boolean;
+    showLocation?: boolean;
+    showSkills?: boolean;
+    showHostedListings?: boolean;
+    showReputation?: boolean;
+    showJoinDate?: boolean;
   } = {};
 
-  if (input.name != null) data.name = input.name;
+  if (input.name != null) data.name = input.name.trim();
   if (input.headline !== undefined) data.headline = input.headline;
   if (input.bio !== undefined) data.bio = input.bio;
+  if (input.pronouns !== undefined) data.pronouns = input.pronouns;
+  if (input.showRealName !== undefined) data.showRealName = input.showRealName;
+  if (input.showLocation !== undefined) data.showLocation = input.showLocation;
+  if (input.showSkills !== undefined) data.showSkills = input.showSkills;
+  if (input.showHostedListings !== undefined) data.showHostedListings = input.showHostedListings;
+  if (input.showReputation !== undefined) data.showReputation = input.showReputation;
+  if (input.showJoinDate !== undefined) data.showJoinDate = input.showJoinDate;
 
   if (input.slug != null) {
     const next = await ensureUniqueUserSlug(input.slug, userId);
     data.slug = next;
   }
 
-  const updated = await db.user.update({
-    where: { id: userId },
-    data,
-    select: PUBLIC_USER_SELECT,
-  });
+  if (input.links !== undefined) {
+    const normalized: ProfileLinkInput[] = [];
+    for (let i = 0; i < input.links.length; i++) {
+      const link = input.links[i];
+      const label = link.label.trim().slice(0, 40);
+      const url = link.url.trim();
+      if (!label || !url) continue;
+      if (!isHttpUrl(url)) {
+        throw new Error(`Invalid URL for link "${label || "untitled"}"`);
+      }
+      normalized.push({ label, url, sortOrder: link.sortOrder ?? i });
+    }
+    if (normalized.length > 12) {
+      throw new Error("At most 12 profile links");
+    }
+
+    await db.$transaction(async (tx) => {
+      await tx.profileLink.deleteMany({ where: { userId } });
+      if (normalized.length) {
+        await tx.profileLink.createMany({
+          data: normalized.map((l, i) => ({
+            userId,
+            label: l.label,
+            url: l.url,
+            sortOrder: l.sortOrder ?? i,
+          })),
+        });
+      }
+      await tx.user.update({
+        where: { id: userId },
+        data,
+      });
+    });
+  } else {
+    await db.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  const updated = await getOwnProfile(userId);
+  if (!updated) throw new Error("Profile not found");
 
   // One-time profile completion bonus when headline + bio present
   if (updated.headline && updated.bio) {
@@ -121,4 +232,20 @@ export async function updateOwnProfile(userId: string, input: UpdateOwnProfileIn
   }
 
   return updated;
+}
+
+export async function updateOwnAvatar(userId: string, avatarUrl: string) {
+  return db.user.update({
+    where: { id: userId },
+    data: { avatarUrl },
+    select: OWN_PROFILE_SELECT,
+  });
+}
+
+export async function updateOwnCover(userId: string, coverImageUrl: string) {
+  return db.user.update({
+    where: { id: userId },
+    data: { coverImageUrl },
+    select: OWN_PROFILE_SELECT,
+  });
 }

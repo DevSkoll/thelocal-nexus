@@ -58,6 +58,17 @@ docker compose down -v          # Stop and wipe database volume
 docker compose restart          # Restart (re-seeds if DEMO_SEED=true)
 ```
 
+## Profile uploads
+
+Avatar and cover images are stored on disk (no S3 yet):
+
+- **Local/dev:** `data/uploads/{avatars,covers}` (gitignored; override with `UPLOAD_ROOT`)
+- **Docker:** `/data/uploads/{avatars,covers}` when `/data` exists (same volume as SQLite)
+
+Public URLs are `/uploads/...` and are served by `src/app/uploads/[...path]/route.ts`.
+
+For production, ensure the `/data` volume (or set `UPLOAD_ROOT`) persists across container rebuilds. Without a volume, uploads are lost on recreate.
+
 ## Production notes
 
 - SQLite suits demo/single-node only. For multi-instance production, migrate to Postgres.

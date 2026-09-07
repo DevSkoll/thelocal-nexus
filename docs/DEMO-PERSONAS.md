@@ -36,6 +36,9 @@ Sign in at `/login` with phone OTP — no password required.
 
 ### Todd Williams — +15035550103
 
+- **Privacy demo:** `showRealName: false`, `showLocation: false`, `showJoinDate: false` (public profile shows username only)
+
+
 - **Role:** Volunteer coordinator, pending RSVPs
 - **Tier:** Phone verified, not Verified Host
 - **Location:** Portland, OR (15 mi radius)

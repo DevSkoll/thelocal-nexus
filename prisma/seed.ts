@@ -27,6 +27,7 @@ function daysFromNow(days: number, hours = 0) {
 
 async function main() {
   await db.phoneOtpChallenge.deleteMany();
+  await db.profileLink.deleteMany();
   await db.suggestionVote.deleteMany();
   await db.suggestion.deleteMany();
   await db.feedback.deleteMany();
@@ -64,6 +65,13 @@ async function main() {
       slug: "joe-martinez",
       headline: "Bike club organizer · weekend rides",
       bio: "Bike enthusiast. Building community one ride at a time.",
+      pronouns: "he/him",
+      showRealName: true,
+      showLocation: true,
+      showSkills: true,
+      showHostedListings: true,
+      showReputation: true,
+      showJoinDate: true,
       verificationTier: "VERIFIED_HOST",
       isModerator: true,
       reputationScore: 72,
@@ -82,6 +90,12 @@ async function main() {
       alerts: {
         create: [{ interestId: interestId("cycling"), radiusMiles: 20 }],
       },
+      profileLinks: {
+        create: [
+          { label: "Website", url: "https://example.com/joe-rides", sortOrder: 0 },
+          { label: "Instagram", url: "https://instagram.com/example", sortOrder: 1 },
+        ],
+      },
     },
   });
 
@@ -94,6 +108,13 @@ async function main() {
       slug: "mira-chen",
       headline: "Barn host · music, D&D, and art",
       bio: "Barn host for music nights, D&D, and art gatherings.",
+      pronouns: "she/her",
+      showRealName: true,
+      showLocation: true,
+      showSkills: true,
+      showHostedListings: true,
+      showReputation: true,
+      showJoinDate: true,
       verificationTier: "VERIFIED_HOST",
       reputationScore: 65,
       reputationUpdatedAt: verifiedAt,
@@ -115,6 +136,11 @@ async function main() {
           { interestId: interestId("arts"), radiusMiles: 20 },
         ],
       },
+      profileLinks: {
+        create: [
+          { label: "LinkedIn", url: "https://linkedin.com/in/example", sortOrder: 0 },
+        ],
+      },
     },
   });
 
@@ -126,7 +152,13 @@ async function main() {
       name: "Todd Williams",
       slug: "todd-williams",
       headline: "Volunteer coordinator · river cleanups",
-      bio: "Volunteer coordinator at Riverfront Community Network.",
+      bio: "Volunteer coordinator at Riverfront Community Network. Prefers a quieter public profile.",
+      showRealName: false,
+      showLocation: false,
+      showSkills: true,
+      showHostedListings: true,
+      showReputation: true,
+      showJoinDate: false,
       verificationTier: "UNVERIFIED",
       reputationScore: 18,
       reputationUpdatedAt: verifiedAt,
@@ -156,6 +188,13 @@ async function main() {
       slug: "sam-okonkwo",
       headline: "Hawthorne Roastery · open mics & coffee",
       bio: "Owner of Hawthorne Roastery. Hosting open mics and neighborhood events.",
+      pronouns: "he/him",
+      showRealName: true,
+      showLocation: true,
+      showSkills: true,
+      showHostedListings: true,
+      showReputation: true,
+      showJoinDate: true,
       verificationTier: "VERIFIED_HOST",
       reputationScore: 58,
       reputationUpdatedAt: verifiedAt,
@@ -166,6 +205,13 @@ async function main() {
       radiusMiles: 20,
       interests: {
         create: [{ interestId: interestId("music") }, { interestId: interestId("food") }],
+      },
+      profileLinks: {
+        create: [
+          { label: "Website", url: "https://example.com/hawthorne-roastery", sortOrder: 0 },
+          { label: "Facebook", url: "https://facebook.com/example", sortOrder: 1 },
+          { label: "X", url: "https://x.com/example", sortOrder: 2 },
+        ],
       },
     },
   });

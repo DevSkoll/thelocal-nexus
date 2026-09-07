@@ -73,6 +73,20 @@ The only required real-world identifier is a **working cellphone number**.
 
 We collect minimal data. Phone numbers are never shown publicly (masked in UI).
 
+### Profile privacy defaults
+
+Public profiles use a **username (`slug`)** in URLs (`/u/[slug]`). Display name, location, skills, hosted listings, reputation, and join date are each toggleable by the member.
+
+| Flag | Default | Notes |
+|------|---------|-------|
+| `showRealName` | on | Off → public view shows username only |
+| `showLocation` | on | City/neighborhood label only (never street/phone) |
+| `showReputation` | on | Trust is a community signal |
+| `showJoinDate` | on | “Member since …” |
+| `showSkills` / `showHostedListings` | on | Hide sections if preferred |
+
+Phone is primary identity and **never** returned by public profile APIs.
+
 ## Brand
 
 Visual design uses an American-proud palette (navy, red, white). Copy is community-focused — colors express pride, words express connection. No patriotic slogans in text.

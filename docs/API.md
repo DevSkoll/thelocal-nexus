@@ -123,6 +123,31 @@ Host only. Requires auth.
 { "rsvpId": "<cuid>", "approved": true }
 ```
 
+
+## Profiles
+
+### `GET /api/profiles/:slug`
+
+Public profile. Never returns phone or email. Honors privacy flags (`showRealName`, `showLocation`, etc.).
+
+### `GET /api/profiles/me`
+
+Own profile including privacy toggles and `profileLinks`. Requires auth.
+
+### `PATCH /api/profiles/me`
+
+Requires auth. Updates identity, about, privacy toggles, and replaces `links` when provided.
+
+**Body (all optional):** `name`, `slug`, `headline`, `bio`, `pronouns`, privacy booleans, `links: [{ label, url, sortOrder? }]` (max 12).
+
+### `POST /api/profiles/me/avatar` · `POST /api/profiles/me/cover`
+
+Multipart upload (`file`). Requires phone verification. JPEG/PNG/WebP, max 5MB. Stores under upload root; returns public `/uploads/...` URL.
+
+### `GET /uploads/:kind/:filename`
+
+Serves stored avatar/cover files (`kind` = `avatars` | `covers`).
+
 ## Settings
 
 ### `PATCH /api/settings`

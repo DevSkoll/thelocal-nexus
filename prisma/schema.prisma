@@ -88,6 +88,14 @@ model User {
   headline            String?
   bio                 String?
   avatarUrl           String?
+  coverImageUrl       String?
+  pronouns            String?
+  showRealName        Boolean          @default(true)
+  showLocation        Boolean          @default(true)
+  showSkills          Boolean          @default(true)
+  showHostedListings  Boolean          @default(true)
+  showReputation      Boolean          @default(true)
+  showJoinDate        Boolean          @default(true)
   verificationTier    VerificationTier @default(UNVERIFIED)
   isModerator         Boolean          @default(false)
   reputationScore     Int              @default(0)
@@ -117,6 +125,19 @@ model User {
   feedbackReceived     Feedback[]          @relation("FeedbackTo")
   suggestions          Suggestion[]
   suggestionVotes      SuggestionVote[]
+  profileLinks         ProfileLink[]
+}
+
+model ProfileLink {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String
+  url       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sortOrder])
 }
 
 model Interest {

@@ -16,7 +16,8 @@ Quick reference: [`.grok/references/schema-reference.md`](../.grok/references/sc
 
 | Model | Purpose |
 |-------|---------|
-| User | Phone (primary), optional email, location, host trust tier, interests |
+| User | Phone (primary), optional email, location, profile privacy flags, avatar/cover, host trust tier, interests |
+| ProfileLink | Modular public links (label, url, sortOrder) on a user profile |
 | PhoneOtpChallenge | Mock SMS OTP storage (dev only) |
 | Interest | Shared taxonomy (cycling, music, etc.) |
 | Listing | Events, hangouts, volunteer ops — the atomic unit |

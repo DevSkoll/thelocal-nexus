@@ -17,15 +17,20 @@ export default async function SettingsPage() {
 
   const badges = formatVerificationBadges(user);
 
-  const alerts = await db.alert.findMany({
-    where: { userId: user.id },
-    include: { interest: true },
-  });
-
-  const groups = await db.groupMember.findMany({
-    where: { userId: user.id },
-    include: { group: true },
-  });
+  const [alerts, groups, profileLinks] = await Promise.all([
+    db.alert.findMany({
+      where: { userId: user.id },
+      include: { interest: true },
+    }),
+    db.groupMember.findMany({
+      where: { userId: user.id },
+      include: { group: true },
+    }),
+    db.profileLink.findMany({
+      where: { userId: user.id },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -63,13 +68,26 @@ export default async function SettingsPage() {
       </section>
 
       
-      <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
-        <h2 className="font-serif text-lg font-semibold mb-4">Edit public profile</h2>
+      <section id="edit-profile" className="mt-6 rounded-[1.75rem] border border-stone/60 bg-white p-6 scroll-mt-24">
+        <h2 className="font-serif text-lg font-semibold mb-1">Edit public profile</h2>
+        <p className="text-sm text-ink-muted mb-5">
+          Customize how neighbors see you. Phone number stays private — always.
+        </p>
         <ProfileEditForm
           name={user.name}
           slug={user.slug}
           headline={user.headline}
           bio={user.bio}
+          pronouns={user.pronouns}
+          avatarUrl={user.avatarUrl}
+          coverImageUrl={user.coverImageUrl}
+          showRealName={user.showRealName}
+          showLocation={user.showLocation}
+          showSkills={user.showSkills}
+          showHostedListings={user.showHostedListings}
+          showReputation={user.showReputation}
+          showJoinDate={user.showJoinDate}
+          links={profileLinks.map((l) => ({ label: l.label, url: l.url }))}
         />
       </section>
       <section className="mt-6 rounded-2xl border border-stone/60 bg-white p-6">
