@@ -20,6 +20,20 @@ Defined in `src/app/globals.css`:
 
 Tailwind classes: `bg-sage`, `text-terracotta`, `bg-cream-dark`, etc.
 
+## App icon
+
+The header tile, tab favicon, and Apple touch icon share one mark: terracotta (`#BF0A30`) rounded square, white slab-serif **L**.
+
+| File | Use |
+|------|-----|
+| `src/app/favicon.ico` | `/favicon.ico` (16/32/48) |
+| `src/app/icon.svg` | Vector tab icon |
+| `src/app/icon.png` | 32px raster fallback |
+| `src/app/apple-icon.png` | 180px Apple touch icon |
+| `public/brands/thelocal-mark.svg` | Header / in-app mark |
+
+Regenerate with `python3 scripts/generate-favicon.py`.
+
 ## Brand utilities
 
 ```css

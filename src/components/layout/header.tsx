@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Plus, Search, User, LayoutDashboard, Shield } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/auth";
@@ -18,9 +19,15 @@ export async function Header() {
       <div className="border-b border-sage-dark/30 bg-sage text-white">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 sm:gap-4 px-4">
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-red text-white font-serif text-lg font-bold shadow-sm ring-2 ring-white/20">
-              L
-            </div>
+            <Image
+              src="/brands/thelocal-mark.svg"
+              alt={APP_NAME}
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-lg shadow-sm ring-2 ring-white/20"
+              unoptimized
+              priority
+            />
             <div className="hidden sm:block">
               <span className="font-serif text-lg font-bold text-white group-hover:text-white/90 transition-colors">
                 {APP_NAME}

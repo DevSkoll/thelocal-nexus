@@ -7,6 +7,10 @@ and this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added
+
+- Site favicon and apple-touch icon matching the header mark (terracotta tile, white slab-serif L)
+
 ## [0.1.0] — 2026-09-07
 
 First public source drop. MVP demo: listings, discovery, groups, phone OTP, and trust tools.
