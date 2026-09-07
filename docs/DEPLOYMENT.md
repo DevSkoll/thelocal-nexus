@@ -35,18 +35,18 @@ Open `http://<server-ip>:3000`
 
 Set `DEMO_SEED=false` after first deploy to preserve volume data between restarts.
 
-## Demo login
+## Demo / crew login
 
-Phone OTP uses mock SMS when Twilio is not configured. Demo phones:
+Crew test phones always use mock OTP (even when Twilio is configured). They never receive SMS; the API returns `devCode`.
 
 | Persona | Phone |
 |---------|-------|
-| Joe | +15035550101 |
-| Mira | +15035550102 |
-| Todd | +15035550103 |
-| Sam | +15035550104 |
+| Maya Rivera | +15551001001 |
+| Sam Okonkwo | +15551001002 |
+| Harper Chen | +15551001003 |
+| Avery Brooks | +15551001004 |
 
-OTP appears in the login UI and container logs.
+Pattern: `+15551001xxx` or env `TEST_OTP_PHONES`. See [DEMO-PERSONAS.md](DEMO-PERSONAS.md).
 
 ## Commands
 
