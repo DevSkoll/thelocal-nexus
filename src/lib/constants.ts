@@ -54,6 +54,14 @@ export const DISCOVER_INTENTS = [
     emptyBody: "No gatherings or activities in this area. Be the first to post one.",
   },
   {
+    value: "volunteer",
+    label: "Volunteer",
+    description: "Unpaid community work and mutual aid",
+    emptyTitle: "No volunteer opportunities nearby",
+    emptyBody:
+      "No unpaid community work listed in this area yet. Post a cleanup, food drive, or mutual-aid shift — free to join, always.",
+  },
+  {
     value: "help",
     label: "Help",
     description: "Neighbors looking for a hand",
@@ -72,6 +80,13 @@ export const DISCOVER_INTENTS = [
 export type DiscoverIntent = (typeof DISCOVER_INTENTS)[number]["value"];
 
 /** Listing types included when an intent chip is selected. Offer also pulls SkillOffers. */
+/**
+ * Dual-bucket mapping (same pattern as workshops):
+ * - WORKSHOP stays under Do and also under Offer
+ * - VOLUNTEER stays under Do and also under Volunteer
+ * Volunteer chip is VOLUNTEER listings only (unpaid community work).
+ * Paid/skill services belong on Offer via SkillOffer + workshops — not here.
+ */
 export const INTENT_LISTING_TYPES: Record<DiscoverIntent, readonly string[]> = {
   do: [
     "ONE_TIME_EVENT",
@@ -81,13 +96,16 @@ export const INTENT_LISTING_TYPES: Record<DiscoverIntent, readonly string[]> = {
     "VOLUNTEER",
     "WORKSHOP",
   ],
+  volunteer: ["VOLUNTEER"],
   help: ["LOOKING_FOR"],
   // Workshops (esp. paid/skill-share) + SkillOffer surface on Discover
   offer: ["WORKSHOP"],
 };
 
 export function parseDiscoverIntent(value: string | undefined | null): DiscoverIntent | undefined {
-  if (value === "do" || value === "help" || value === "offer") return value;
+  if (value === "do" || value === "volunteer" || value === "help" || value === "offer") {
+    return value;
+  }
   return undefined;
 }
 

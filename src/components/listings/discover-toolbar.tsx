@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, X, Sparkles, HandHelping, CalendarHeart } from "lucide-react";
+import { Search, SlidersHorizontal, X, Sparkles, HandHelping, CalendarHeart, HeartHandshake } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DISCOVER_INTENTS,
@@ -28,6 +28,7 @@ function buildDiscoverHref(
 
 const INTENT_ICONS: Record<DiscoverIntent, typeof Sparkles> = {
   do: CalendarHeart,
+  volunteer: HeartHandshake,
   help: HandHelping,
   offer: Sparkles,
 };
@@ -135,8 +136,10 @@ export function DiscoverToolbar({
                 ? "Search help requests..."
                 : intent === "offer"
                   ? "Search offers & workshops..."
-                  : intent === "do"
-                    ? "Search events & activities..."
+                  : intent === "volunteer"
+                    ? "Search volunteer opportunities..."
+                    : intent === "do"
+                      ? "Search events & activities..."
                     : "Search listings..."
             }
             className="pl-10 pr-9"

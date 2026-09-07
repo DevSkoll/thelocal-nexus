@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -13,11 +14,19 @@ interface PostFormProps {
   userGroups: { id: string; name: string }[];
   defaultLocation: { lat: number; lng: number; label: string };
   initialGroupId?: string;
+  /** Deep-link from Discover: /post?type=VOLUNTEER */
+  initialType?: string;
 }
 
-export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }: PostFormProps) {
+const VALID_LISTING_TYPE_VALUES = new Set(LISTING_TYPES.map((x) => x.value));
+
+export function PostForm({ userId, userGroups, defaultLocation, initialGroupId, initialType }: PostFormProps) {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const resolvedInitialType =
+    initialType && VALID_LISTING_TYPE_VALUES.has(initialType as (typeof LISTING_TYPES)[number]["value"])
+      ? initialType
+      : "";
+  const [step, setStep] = useState(resolvedInitialType ? 2 : 1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,7 +34,7 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }
     !!initialGroupId && userGroups.some((g) => g.id === initialGroupId);
 
   const [form, setForm] = useState({
-    type: "",
+    type: resolvedInitialType,
     title: "",
     description: "",
     locationLabel: defaultLocation.label,
@@ -36,7 +45,7 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }
     endsAt: "",
     recurrenceRule: "",
     capacity: "",
-    rsvpRequired: false,
+    rsvpRequired: resolvedInitialType ? !["HANGOUT_SPOT", "GROUP_SEEKING", "LOOKING_FOR"].includes(resolvedInitialType) : false,
     rsvpApprovalRequired: false,
     homeHosted: false,
     posterType: initialAsGroup ? "GROUP" : "PERSON",
@@ -59,7 +68,13 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }
       const res = await fetch("/api/listings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, userId }),
+        body: JSON.stringify({
+          ...form,
+          userId,
+          isPaid: form.type === "VOLUNTEER" ? false : form.isPaid,
+          priceMin: form.type === "VOLUNTEER" ? "" : form.priceMin,
+          priceMax: form.type === "VOLUNTEER" ? "" : form.priceMax,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to create listing");
@@ -123,6 +138,20 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }
       {step === 2 && (
         <div className="space-y-4">
           <h2 className="font-serif text-xl font-semibold">Tell people about it</h2>
+
+          {form.type === "VOLUNTEER" && (
+            <div className="rounded-2xl border border-sage/30 bg-sage/5 p-4 text-sm">
+              <p className="font-semibold text-sage">Volunteer opportunities are unpaid</p>
+              <p className="mt-1 text-ink-muted">
+                Use this for cleanups, food drives, mutual aid, and other free community work.
+                Offering a skill or charging for help?{" "}
+                <Link href="/skills/new" className="font-medium text-terracotta hover:underline">
+                  Post a skill offer instead
+                </Link>
+                .
+              </p>
+            </div>
+          )}
 
           {userGroups.length > 0 && (
             <div className="rounded-2xl border border-sage/25 bg-sage/5 p-4">
@@ -286,6 +315,16 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }
           </div>
 
           <div className="rounded-xl border border-stone/60 p-4 space-y-3">
+            {form.type === "VOLUNTEER" ? (
+              <p className="text-sm text-ink-muted">
+                <span className="font-medium text-ink">Volunteer listings stay free.</span>{" "}
+                No price — neighbors join to help, not to hire. Skills &amp; paid help go under{" "}
+                <Link href="/skills/new" className="text-terracotta hover:underline">
+                  Offer a skill
+                </Link>
+                .
+              </p>
+            ) : (
             <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
@@ -295,6 +334,7 @@ export function PostForm({ userId, userGroups, defaultLocation, initialGroupId }
               />
               This is a paid event
             </label>
+            )}
             {form.isPaid && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
