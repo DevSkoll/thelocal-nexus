@@ -45,7 +45,7 @@ On production/demo hosts (Thor + `docker-compose.prod.yml`), `DEMO_SEED` default
 
 Self-hosted proof-of-work on `POST /api/auth/phone/send` via the official `altcha` widget + `altcha-lib`.
 
-- Set **`ALTCHA_HMAC_KEY`* on every non-local host (Thor demo / production). Missing key in `NODE_ENV=production` returns 500 from challenge/send.
+- Set **`ALTCHA_HMAC_KEY`** on every non-local host (Thor demo / production). Missing key in `NODE_ENV=production` returns 500 from challenge/send.
 - Local `npm run dev` may omit the key and uses a clearly insecure in-code fallback (never ship that value).
 - Challenge: `GET /api/auth/altcha/challenge`. Optional verify: `POST /api/auth/altcha/verify`.
 - Out of scope for this protect: authenticated create/message/suggestion routes.
