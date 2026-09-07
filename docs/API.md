@@ -8,11 +8,29 @@ Privileged actions (create listing, post comment) require `phoneVerifiedAt` — 
 
 ## Auth
 
+### `GET /api/auth/altcha/challenge`
+
+Issue a fresh self-hosted ALTCHA proof-of-work challenge for the login widget.
+
+**Response:** ALTCHA challenge JSON (`parameters`, `signature`). `Cache-Control: no-store`.
+
+### `POST /api/auth/altcha/verify`
+
+Optional standalone verification of an ALTCHA payload.
+
+**Body:** `{ "altcha": "<base64-payload>" }`
+
+**Response:** `{ ok: true, verified: true }` or `400` `{ error, verified: false }`
+
 ### `POST /api/auth/phone/send`
 
 Send OTP to phone. Uses Twilio Verify when env vars set; mock SMS in dev (returns `devCode`).
 
-**Body:** `{ "phone": "(503) 555-0101" }`
+Requires a valid ALTCHA payload (from the login widget) unless `ALTCHA_BYPASS_TEST_PHONES=true` and the phone is a crew/test OTP number.
+
+**Body:** `{ "phone": "(503) 555-0101", "altcha": "<base64-payload>" }`
+
+**Errors:** `400` if ALTCHA is missing/invalid (`ALTCHA verification required`, etc.) — checked before `sendOtp`.
 
 **Response:** `{ ok: true, phone: "+15035550101", mock: true, devCode?: "123456" }`
 

@@ -36,8 +36,20 @@ On production/demo hosts (Thor + `docker-compose.prod.yml`), `DEMO_SEED` default
 | `DEMO_SEED` | `true` | **`false`** | Force wipe+reseed on start when `true`. When `false`, seed only if DB has no users |
 | `DEV_GEO_*` | Fayetteville, NC | same | Fallback location when IP is private |
 | `TWILIO_*` | (empty) | same | Mock SMS login when unset |
+| `ALTCHA_HMAC_KEY` | (required in prod) | **required** | HMAC secret for self-hosted ALTCHA PoW on phone OTP send. Generate a long random string (e.g. `openssl rand -hex 32`). |
+| `ALTCHA_BYPASS_TEST_PHONES` | unset / `false` | unset | Optional. When `true`, skip ALTCHA for crew/test OTP phones (`+15551001xxx` / `TEST_OTP_PHONES`). Default off — prefer PoW (widget auto-solves). |
 
 **Production / demo host (Thor):** keep `DEMO_SEED=false` after first boot (prod overlay default). Set `DEMO_SEED=true` only for an intentional full demo reset. Prefer a one-shot `docker compose run` / manual seed over leaving it `true` in `.env`.
+
+## ALTCHA (phone OTP send)
+
+Self-hosted proof-of-work on `POST /api/auth/phone/send` via the official `altcha` widget + `altcha-lib`.
+
+- Set **`ALTCHA_HMAC_KEY`** on every non-local host (Thor demo / production). Missing key in `NODE_ENV=production` returns 500 from challenge/send.
+- Local `npm run dev` may omit the key and uses a clearly insecure in-code fallback (never ship that value).
+- Challenge: `GET /api/auth/altcha/challenge`. Optional verify: `POST /api/auth/altcha/verify`.
+- Out of scope for this protect: authenticated create/message/suggestion routes.
+- **Follow-up:** add IP / phone rate-limiting in front of OTP send (ALTCHA raises bot cost; it is not a full rate limiter).
 
 ## Demo / crew login
 
