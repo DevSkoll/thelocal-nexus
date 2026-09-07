@@ -21,6 +21,10 @@ Default database URL is `file:./prisma/dev.db`. Override with `.env`:
 
 ```
 DATABASE_URL="file:./prisma/dev.db"
+# Optional locally — insecure in-code fallback is used when unset (dev only).
+# ALTCHA_HMAC_KEY="$(openssl rand -hex 32)"
+# Optional narrow crew bypass (default off):
+# ALTCHA_BYPASS_TEST_PHONES=true
 ```
 
 ## Commands
@@ -53,6 +57,15 @@ Access is granted when:
 2. The user id or slug is listed in `MODERATOR_USER_IDS` (comma-separated), e.g. `MODERATOR_USER_IDS=joe-martinez`.
 
 APIs never return phone numbers in the queue — display name + slug only. See [API.md](API.md) Reports section.
+
+## ALTCHA on login
+
+`/login` embeds the ALTCHA widget (`auto="onload"` so PoW auto-solves in normal browsers). `POST /api/auth/phone/send` requires a valid `altcha` payload (400 if missing/invalid) before `sendOtp`.
+
+- Prefer **no bypass** for crew phones — automation should wait for the widget.
+- If crew login is blocked in a constrained environment, set `ALTCHA_BYPASS_TEST_PHONES=true` (default off; only skips ALTCHA for `isTestOtpPhone` numbers).
+- Challenge route: `GET /api/auth/altcha/challenge`.
+- **Follow-up:** OTP send rate-limiting (not implemented here).
 
 ## Demo / crew login (mock OTP)
 

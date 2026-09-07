@@ -21,6 +21,8 @@
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "altcha": "^3.2.2",
+    "altcha-lib": "^2.4.0",
     "better-sqlite3": "^12.11.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",

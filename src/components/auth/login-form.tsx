@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Phone, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AltchaWidget } from "@/components/auth/altcha-widget";
 
 type Step = "phone" | "otp" | "name";
 
@@ -19,20 +20,29 @@ export function LoginForm() {
   const [mockMode, setMockMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [altchaPayload, setAltchaPayload] = useState<string | null>(null);
+  const [altchaKey, setAltchaKey] = useState(0);
 
   async function handleSendCode(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!altchaPayload) {
+      setError("Complete the quick bot check before sending a code");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/auth/phone/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ phone, altcha: altchaPayload }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Failed to send code");
+        // Force a fresh PoW challenge after a failed send
+        setAltchaPayload(null);
+        setAltchaKey((k) => k + 1);
         return;
       }
       setNormalizedPhone(data.phone);
@@ -145,7 +155,13 @@ export function LoginForm() {
         </Button>
         <button
           type="button"
-          onClick={() => { setStep("phone"); setCode(""); setError(null); }}
+          onClick={() => {
+            setStep("phone");
+            setCode("");
+            setError(null);
+            setAltchaPayload(null);
+            setAltchaKey((k) => k + 1);
+          }}
           className="w-full text-sm text-ink-muted hover:text-ink"
         >
           Use a different number
@@ -174,8 +190,17 @@ export function LoginForm() {
           className="pl-10"
         />
       </div>
+      <AltchaWidget
+        key={altchaKey}
+        onPayloadChange={setAltchaPayload}
+        className="rounded-xl border border-stone/60 bg-cream px-3 py-2"
+      />
       {error && <p className="text-sm text-terracotta">{error}</p>}
-      <Button type="submit" disabled={loading || phone.replace(/\D/g, "").length < 10} className="w-full">
+      <Button
+        type="submit"
+        disabled={loading || !altchaPayload || phone.replace(/\D/g, "").length < 10}
+        className="w-full"
+      >
         {loading ? "Sending..." : "Send verification code"}
       </Button>
       <p className="text-xs text-ink-muted text-center">
