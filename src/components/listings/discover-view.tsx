@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Map, List } from "lucide-react";
 import { ListingCard } from "./listing-card";
 import { ListingMap } from "./listing-map";
 import { DiscoverToolbar } from "./discover-toolbar";
+import { SkillOfferCard } from "@/components/skills/skill-offer-card";
 import { cn } from "@/lib/utils";
+import { DISCOVER_INTENTS, type DiscoverIntent } from "@/lib/constants";
 import type { Listing, User, Group, Interest, ListingInterest, Rsvp } from "@/generated/prisma/client";
 
 type ListingWithRelations = Listing & {
@@ -17,8 +20,28 @@ type ListingWithRelations = Listing & {
   distance?: number;
 };
 
+type SkillOfferForDiscover = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  locationLabel: string | null;
+  priceMin: number | null;
+  priceMax: number | null;
+  distance?: number;
+  interests: { interest: { id: string; slug: string; name: string; icon: string | null } }[];
+  user: {
+    slug: string;
+    name: string;
+    reputationScore: number;
+    verificationTier: string;
+  };
+};
+
 interface DiscoverViewProps {
   listings: ListingWithRelations[];
+  skillOffers?: SkillOfferForDiscover[];
+  intent?: DiscoverIntent;
   center: [number, number];
 }
 
@@ -42,7 +65,31 @@ function matchesSearch(listing: ListingWithRelations, query: string): boolean {
   return tokens.every((token) => haystack.includes(token));
 }
 
-export function DiscoverView({ listings, center }: DiscoverViewProps) {
+function matchesSkillSearch(offer: SkillOfferForDiscover, query: string): boolean {
+  const q = query.toLowerCase().trim();
+  if (!q) return true;
+
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const haystack = [
+    offer.title,
+    offer.description,
+    offer.locationLabel,
+    offer.user?.name,
+    ...offer.interests.map(({ interest }) => `${interest.name} ${interest.slug}`),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return tokens.every((token) => haystack.includes(token));
+}
+
+export function DiscoverView({
+  listings,
+  skillOffers = [],
+  intent,
+  center,
+}: DiscoverViewProps) {
   const [view, setView] = useState<"list" | "map">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(true);
@@ -53,6 +100,17 @@ export function DiscoverView({ listings, center }: DiscoverViewProps) {
     [listings, searchQuery]
   );
 
+  const filteredSkills = useMemo(
+    () => skillOffers.filter((offer) => matchesSkillSearch(offer, searchQuery)),
+    [skillOffers, searchQuery]
+  );
+
+  const totalLoaded = listings.length + skillOffers.length;
+  const resultCount = filteredListings.length + filteredSkills.length;
+  const intentMeta = intent
+    ? DISCOVER_INTENTS.find((i) => i.value === intent)
+    : undefined;
+
   return (
     <div>
       <div className="sticky top-16 z-40 -mx-4 px-4 py-3 mb-4 bg-cream-dark/95 backdrop-blur-sm border-b border-stone/30">
@@ -61,8 +119,9 @@ export function DiscoverView({ listings, center }: DiscoverViewProps) {
           onSearchChange={setSearchQuery}
           filtersOpen={filtersOpen}
           onFiltersToggle={() => setFiltersOpen((open) => !open)}
-          resultCount={filteredListings.length}
-          totalCount={listings.length}
+          resultCount={resultCount}
+          totalCount={totalLoaded}
+          intent={intent}
         />
       </div>
 
@@ -96,15 +155,49 @@ export function DiscoverView({ listings, center }: DiscoverViewProps) {
           {filteredListings.map((listing) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
-          {filteredListings.length === 0 && (
+          {filteredSkills.map((offer) => (
+            <SkillOfferCard key={`skill-${offer.id}`} offer={offer} />
+          ))}
+          {resultCount === 0 && (
             <div className="col-span-full rounded-2xl border border-dashed border-stone p-12 text-center">
-              {listings.length === 0 ? (
-                <>
-                  <p className="font-serif text-lg text-ink">Nothing here yet</p>
-                  <p className="mt-2 text-sm text-ink-muted">
-                    Be the first to post something in your area.
-                  </p>
-                </>
+              {totalLoaded === 0 ? (
+                intentMeta ? (
+                  <>
+                    <p className="font-serif text-lg text-ink">{intentMeta.emptyTitle}</p>
+                    <p className="mt-2 text-sm text-ink-muted">{intentMeta.emptyBody}</p>
+                    {intent === "offer" && (
+                      <Link
+                        href="/skills/new"
+                        className="inline-block mt-4 text-sm font-semibold text-terracotta hover:underline"
+                      >
+                        Offer a skill →
+                      </Link>
+                    )}
+                    {intent === "do" && (
+                      <Link
+                        href="/post"
+                        className="inline-block mt-4 text-sm font-semibold text-terracotta hover:underline"
+                      >
+                        Post something to do →
+                      </Link>
+                    )}
+                    {intent === "help" && (
+                      <Link
+                        href="/post"
+                        className="inline-block mt-4 text-sm font-semibold text-terracotta hover:underline"
+                      >
+                        Ask for help →
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="font-serif text-lg text-ink">Nothing here yet</p>
+                    <p className="mt-2 text-sm text-ink-muted">
+                      Be the first to post something in your area.
+                    </p>
+                  </>
+                )
               ) : (
                 <>
                   <p className="font-serif text-lg text-ink">No matches</p>
@@ -128,11 +221,19 @@ export function DiscoverView({ listings, center }: DiscoverViewProps) {
           )}
         </div>
       ) : (
-        <ListingMap
-          listings={filteredListings}
-          center={center}
-          onSelect={(slug) => router.push(`/listings/${slug}`)}
-        />
+        <div className="space-y-3">
+          {intent === "offer" && filteredSkills.length > 0 && (
+            <p className="text-xs text-ink-muted">
+              Map shows workshops; {filteredSkills.length} skill offer
+              {filteredSkills.length === 1 ? "" : "s"} appear in Browse.
+            </p>
+          )}
+          <ListingMap
+            listings={filteredListings}
+            center={center}
+            onSelect={(slug) => router.push(`/listings/${slug}`)}
+          />
+        </div>
       )}
     </div>
   );

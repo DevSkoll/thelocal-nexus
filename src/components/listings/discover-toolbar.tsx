@@ -3,9 +3,14 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Sparkles, HandHelping, CalendarHeart } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { LISTING_CATEGORIES, LISTING_NATURE_TAGS } from "@/lib/constants";
+import {
+  DISCOVER_INTENTS,
+  LISTING_CATEGORIES,
+  LISTING_NATURE_TAGS,
+  type DiscoverIntent,
+} from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 function buildDiscoverHref(
@@ -21,6 +26,12 @@ function buildDiscoverHref(
   return qs ? `/discover?${qs}` : "/discover";
 }
 
+const INTENT_ICONS: Record<DiscoverIntent, typeof Sparkles> = {
+  do: CalendarHeart,
+  help: HandHelping,
+  offer: Sparkles,
+};
+
 interface DiscoverToolbarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -28,6 +39,7 @@ interface DiscoverToolbarProps {
   onFiltersToggle: () => void;
   resultCount: number;
   totalCount: number;
+  intent?: DiscoverIntent;
 }
 
 export function DiscoverToolbar({
@@ -37,13 +49,19 @@ export function DiscoverToolbar({
   onFiltersToggle,
   resultCount,
   totalCount,
+  intent,
 }: DiscoverToolbarProps) {
   const searchParams = useSearchParams();
   const category = searchParams.get("category") ?? undefined;
   const nature = searchParams.get("nature") ?? undefined;
   const cost = searchParams.get("cost") ?? undefined;
 
-  const base = { category, nature, cost };
+  const base = {
+    category,
+    nature,
+    cost,
+    intent: intent ?? undefined,
+  };
   const activeFilterCount = [category, nature, cost].filter(Boolean).length;
 
   const activeChips: { key: string; label: string; href: string }[] = [];
@@ -77,8 +95,34 @@ export function DiscoverToolbar({
     { value: "paid", label: "Paid" },
   ] as const;
 
+  const intentMeta = intent
+    ? DISCOVER_INTENTS.find((i) => i.value === intent)
+    : undefined;
+
   return (
     <div className="space-y-3">
+      {/* Intent chips — job-to-be-done filter */}
+      <div className="flex gap-2 overflow-x-auto pb-0.5 -mx-0.5 px-0.5 scrollbar-none">
+        <IntentChip
+          href={buildDiscoverHref(base, { intent: undefined })}
+          active={!intent}
+          label="All"
+        />
+        {DISCOVER_INTENTS.map((chip) => {
+          const Icon = INTENT_ICONS[chip.value];
+          return (
+            <IntentChip
+              key={chip.value}
+              href={buildDiscoverHref(base, { intent: chip.value })}
+              active={intent === chip.value}
+              label={chip.label}
+              description={chip.description}
+              icon={<Icon className="h-3.5 w-3.5" />}
+            />
+          );
+        })}
+      </div>
+
       <div className="flex gap-2">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted pointer-events-none" />
@@ -86,7 +130,15 @@ export function DiscoverToolbar({
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search listings..."
+            placeholder={
+              intent === "help"
+                ? "Search help requests..."
+                : intent === "offer"
+                  ? "Search offers & workshops..."
+                  : intent === "do"
+                    ? "Search events & activities..."
+                    : "Search listings..."
+            }
             className="pl-10 pr-9"
             aria-label="Search listings"
           />
@@ -149,7 +201,7 @@ export function DiscoverToolbar({
           ))}
           {activeFilterCount > 0 && (
             <Link
-              href="/discover"
+              href={intent ? `/discover?intent=${intent}` : "/discover"}
               className="text-xs text-ink-muted hover:text-terracotta transition-colors"
             >
               Clear filters
@@ -226,9 +278,16 @@ export function DiscoverToolbar({
       )}
 
       <p className="text-sm text-ink-muted">
-        {searchQuery || activeFilterCount > 0 ? (
+        {searchQuery || activeFilterCount > 0 || intent ? (
           <>
-            Showing {resultCount} of {totalCount} listing{totalCount !== 1 ? "s" : ""}
+            Showing {resultCount} of {totalCount}{" "}
+            {intentMeta
+              ? intent === "offer"
+                ? "result"
+                : "listing"
+              : "listing"}
+            {totalCount !== 1 ? "s" : ""}
+            {intentMeta ? ` · ${intentMeta.label}` : ""}
           </>
         ) : (
           <>
@@ -237,6 +296,37 @@ export function DiscoverToolbar({
         )}
       </p>
     </div>
+  );
+}
+
+function IntentChip({
+  href,
+  active,
+  label,
+  description,
+  icon,
+}: {
+  href: string;
+  active: boolean;
+  label: string;
+  description?: string;
+  icon?: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      title={description}
+      className={cn(
+        "shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all whitespace-nowrap border",
+        active
+          ? "bg-sage text-white border-sage shadow-sm ring-2 ring-sage/20"
+          : "bg-cream border-stone/50 text-ink-muted hover:text-ink hover:border-sage/40 hover:bg-white"
+      )}
+      aria-current={active ? "true" : undefined}
+    >
+      {icon}
+      {label}
+    </Link>
   );
 }
 

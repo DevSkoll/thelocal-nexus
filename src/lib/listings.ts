@@ -8,6 +8,8 @@ export type ListingFilters = {
   lng?: number;
   radiusMiles?: number;
   type?: ListingType;
+  /** When set, filters to any of these types (e.g. Discover intent chips). */
+  types?: ListingType[];
   interestSlug?: string;
   natureTag?: ListingNatureTag;
   isPaid?: boolean;
@@ -20,16 +22,24 @@ export async function getListings(filters: ListingFilters = {}) {
     lng,
     radiusMiles = DEFAULT_RADIUS_MILES,
     type,
+    types,
     interestSlug,
     natureTag,
     isPaid,
     search,
   } = filters;
 
+  const typeFilter =
+    types && types.length > 0
+      ? { type: { in: types } }
+      : type
+        ? { type }
+        : {};
+
   const listings = await db.listing.findMany({
     where: {
       status: "ACTIVE",
-      ...(type ? { type } : {}),
+      ...typeFilter,
       ...(natureTag ? { natureTag } : {}),
       ...(isPaid != null ? { isPaid } : {}),
       ...(interestSlug

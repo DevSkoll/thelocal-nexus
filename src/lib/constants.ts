@@ -43,3 +43,51 @@ export const LISTING_NATURE_TAGS = [
 export const DEFAULT_RADIUS_MILES = 20;
 
 export const RADIUS_OPTIONS = [5, 10, 15, 20, 50] as const;
+
+/** Job-to-be-done chips on Discover — maps onto ListingType (+ SkillOffer for Offer). */
+export const DISCOVER_INTENTS = [
+  {
+    value: "do",
+    label: "Do",
+    description: "Events, rides, hangouts, and things to join",
+    emptyTitle: "Nothing to do nearby yet",
+    emptyBody: "No gatherings or activities in this area. Be the first to post one.",
+  },
+  {
+    value: "help",
+    label: "Help",
+    description: "Neighbors looking for a hand",
+    emptyTitle: "No help requests nearby",
+    emptyBody: "Nobody is asking for help in this area right now. Check back soon, or post if you need a hand.",
+  },
+  {
+    value: "offer",
+    label: "Offer",
+    description: "Skills and workshops neighbors are putting out",
+    emptyTitle: "No offers nearby yet",
+    emptyBody: "No skill offers or workshops in this area. Share what you can do.",
+  },
+] as const;
+
+export type DiscoverIntent = (typeof DISCOVER_INTENTS)[number]["value"];
+
+/** Listing types included when an intent chip is selected. Offer also pulls SkillOffers. */
+export const INTENT_LISTING_TYPES: Record<DiscoverIntent, readonly string[]> = {
+  do: [
+    "ONE_TIME_EVENT",
+    "RECURRING_EVENT",
+    "GROUP_SEEKING",
+    "HANGOUT_SPOT",
+    "VOLUNTEER",
+    "WORKSHOP",
+  ],
+  help: ["LOOKING_FOR"],
+  // Workshops (esp. paid/skill-share) + SkillOffer surface on Discover
+  offer: ["WORKSHOP"],
+};
+
+export function parseDiscoverIntent(value: string | undefined | null): DiscoverIntent | undefined {
+  if (value === "do" || value === "help" || value === "offer") return value;
+  return undefined;
+}
+
