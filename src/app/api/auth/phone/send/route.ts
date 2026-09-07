@@ -6,6 +6,8 @@ import {
   shouldBypassAltchaForPhone,
   verifyAltchaPayload,
 } from "@/lib/altcha";
+import { getClientIp } from "@/lib/geo/ip";
+import { checkAndRecordOtpSend } from "@/lib/otp-rate-limit";
 
 const sendSchema = z.object({
   phone: z.string().min(10).max(20),
@@ -27,6 +29,22 @@ export async function POST(req: NextRequest) {
       if (!verified.ok) {
         return NextResponse.json({ error: verified.error }, { status: 400 });
       }
+    }
+
+    // After ALTCHA, before Twilio/mock send — see docs/DEPLOYMENT.md (OTP rate limits).
+    const ip = getClientIp(req.headers);
+    const limited = checkAndRecordOtpSend({ phone, ip });
+    if (!limited.ok) {
+      return NextResponse.json(
+        {
+          error: limited.error,
+          retryAfterSeconds: limited.retryAfterSeconds,
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSeconds) },
+        }
+      );
     }
 
     const result = await getSmsProvider(phone).sendOtp(phone);

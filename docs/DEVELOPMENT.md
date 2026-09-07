@@ -65,7 +65,14 @@ APIs never return phone numbers in the queue — display name + slug only. See [
 - Prefer **no bypass** for crew phones — automation should wait for the widget.
 - If crew login is blocked in a constrained environment, set `ALTCHA_BYPASS_TEST_PHONES=true` (default off; only skips ALTCHA for `isTestOtpPhone` numbers).
 - Challenge route: `GET /api/auth/altcha/challenge`.
-- **Follow-up:** OTP send rate-limiting (not implemented here).
+## OTP send rate limits
+
+Implemented in `src/lib/otp-rate-limit.ts` on `POST /api/auth/phone/send` (after normalize + ALTCHA, before `sendOtp`):
+
+- Per phone: **1** / 60s and **5** / rolling hour
+- Per IP: **10** / rolling hour (`x-forwarded-for` first hop via `getClientIp`)
+- Exceeded → `429` `{ error, retryAfterSeconds }` (generic; does not leak phone existence)
+- In-memory / single-node OK for Thor; shared store needed if you run multiple app instances
 
 ## Demo / crew login (mock OTP)
 

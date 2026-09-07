@@ -47,7 +47,19 @@ Self-hosted proof-of-work on `POST /api/auth/phone/send` via the official `altch
 - Local `npm run dev` may omit the key and uses a clearly insecure in-code fallback (never ship that value).
 - Challenge: `GET /api/auth/altcha/challenge`. Optional verify: `POST /api/auth/altcha/verify`.
 - Out of scope for this protect: authenticated create/message/suggestion routes.
-- **Follow-up:** add IP / phone rate-limiting in front of OTP send (ALTCHA raises bot cost; it is not a full rate limiter).
+## OTP send rate limits
+
+In-memory limits on `POST /api/auth/phone/send` (after phone normalize + ALTCHA, before `sendOtp`) to reduce Twilio SMS abuse:
+
+| Scope | Limit |
+|-------|--------|
+| Per phone | Max **1** send / **60 seconds**; max **5** sends / rolling **1 hour** |
+| Per IP | Max **10** sends / rolling **1 hour** |
+
+- **IP key:** first hop of `x-forwarded-for`, else `x-real-ip` (`getClientIp` in `src/lib/geo/ip.ts`). Behind a trusted reverse proxy this is the client; misconfigured proxies can collapse many users onto one IP.
+- **Response:** `429` `{ error, retryAfterSeconds }` plus `Retry-After` header. Same generic error for phone/IP limits — never reveals whether the phone exists.
+- **Store:** process-local capped maps (same single-node pattern as ALTCHA `CappedMap`). Fine for single-node Thor. **Multi-instance / multi-replica follow-up:** shared store (e.g. Redis) if you scale beyond one app process.
+- ALTCHA is unchanged (including optional `ALTCHA_BYPASS_TEST_PHONES` for crew phones).
 
 ## Demo / crew login
 

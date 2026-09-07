@@ -30,7 +30,11 @@ Requires a valid ALTCHA payload (from the login widget) unless `ALTCHA_BYPASS_TE
 
 **Body:** `{ "phone": "(503) 555-0101", "altcha": "<base64-payload>" }`
 
-**Errors:** `400` if ALTCHA is missing/invalid (`ALTCHA verification required`, etc.) — checked before `sendOtp`.
+After ALTCHA succeeds, in-memory rate limits apply before `sendOtp`: per phone **1**/60s and **5**/rolling hour; per IP **10**/rolling hour (IP from `x-forwarded-for` first hop / `x-real-ip`).
+
+**Errors:**
+- `400` if ALTCHA is missing/invalid (`ALTCHA verification required`, etc.) — checked before rate limits / `sendOtp`
+- `429` `{ error, retryAfterSeconds }` when rate-limited (generic message; does not reveal whether the phone exists). Also sets `Retry-After`.
 
 **Response:** `{ ok: true, phone: "+15035550101", mock: true, devCode?: "123456" }`
 
