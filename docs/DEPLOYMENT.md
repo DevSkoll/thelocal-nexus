@@ -20,20 +20,24 @@ Open `http://<server-ip>:3000`
 ## What happens on start
 
 1. **Migrations** — `prisma migrate deploy` applies schema
-2. **Seed** — when `DEMO_SEED=true` (default), demo data is loaded (Portland + Fayetteville listings, 4 personas)
+2. **Seed** — runs only when:
+   - `DEMO_SEED=true` (explicit wipe + reseed — destructive), **or**
+   - the database has **no users** yet (first boot / empty volume)
 3. **App** — Next.js standalone server on port 3000
+
+On production/demo hosts (Thor + `docker-compose.prod.yml`), `DEMO_SEED` defaults to **`false`**. After first boot, crew-created listings and users persist across container rebuilds. Never run `docker compose down -v` on Thor unless you intentionally want to wipe `thelocal-data`.
 
 ## Environment variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `APP_PORT` | `3000` | Host port mapping |
-| `DATABASE_URL` | `file:/data/dev.db` | SQLite path inside container |
-| `DEMO_SEED` | `true` | Re-seed demo data on each container start |
-| `DEV_GEO_*` | Fayetteville, NC | Fallback location when IP is private |
-| `TWILIO_*` | (empty) | Mock SMS login when unset |
+| Variable | Default (base) | Default (prod overlay) | Description |
+|----------|----------------|------------------------|-------------|
+| `APP_PORT` | `3000` | `3000` | Host port mapping |
+| `DATABASE_URL` | `file:/data/dev.db` | same | SQLite path inside container |
+| `DEMO_SEED` | `true` | **`false`** | Force wipe+reseed on start when `true`. When `false`, seed only if DB has no users |
+| `DEV_GEO_*` | Fayetteville, NC | same | Fallback location when IP is private |
+| `TWILIO_*` | (empty) | same | Mock SMS login when unset |
 
-Set `DEMO_SEED=false` after first deploy to preserve volume data between restarts.
+**Production / demo host (Thor):** keep `DEMO_SEED=false` after first boot (prod overlay default). Set `DEMO_SEED=true` only for an intentional full demo reset. Prefer a one-shot `docker compose run` / manual seed over leaving it `true` in `.env`.
 
 ## Demo / crew login
 
@@ -51,11 +55,11 @@ Pattern: `+15551001xxx` or env `TEST_OTP_PHONES`. See [DEMO-PERSONAS.md](DEMO-PE
 ## Commands
 
 ```bash
-docker compose up -d --build    # Build and start
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 docker compose logs -f          # Follow logs
-docker compose down             # Stop
-docker compose down -v          # Stop and wipe database volume
-docker compose restart          # Restart (re-seeds if DEMO_SEED=true)
+docker compose down             # Stop (keeps thelocal-data volume)
+docker compose down -v          # Stop and WIPE database volume — avoid on Thor
+docker compose restart          # Restart (does not re-seed unless DEMO_SEED=true or DB empty)
 ```
 
 ## Profile uploads
@@ -74,6 +78,7 @@ For production, ensure the `/data` volume (or set `UPLOAD_ROOT`) persists across
 - SQLite suits demo/single-node only. For multi-instance production, migrate to Postgres.
 - Put a reverse proxy (Caddy, nginx, Traefik) in front for HTTPS.
 - Trust `X-Forwarded-For` from your proxy so IP geolocation works for visitors.
+- **Do not** wipe the `thelocal-data` volume on Thor rebuilds (`down -v` or deleting the volume destroys Mission/crew content).
 
 ## Image details
 
